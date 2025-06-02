@@ -1,0 +1,1338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nicolas Cage's Memory</title>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Press+Start+2P&family=Permanent+Marker&display=swap" rel="stylesheet">
+<style>
+/* General Body & Container Styling */
+body {
+font-family: 'Bangers', cursive; /* Fun, comic-book style font */
+display: flex;
+justify-content: center;
+align-items: center;
+min-height: 100vh;
+background: linear-gradient(135deg, #4a0000, #2a0000, #6a0000); /* Deep maroon gradient - initial */
+color: #ffe0e0; /* Soft red-pink for text */
+margin: 0;
+flex-direction: column;
+padding: 20px;
+box-sizing: border-box;
+overflow-x: hidden;
+transition: background 0.5s ease; /* Transition for background color changes */
+}
+
+.game-container, #image-upload-section {
+background-color: #330000; /* Darker maroon */
+padding: 40px;
+border-radius: 20px; /* More rounded */
+box-shadow: 0 15px 40px rgba(0, 0, 0, 0.9),
+0 0 0 8px rgba(255, 100, 100, 0.4); /* Vibrant pink-red border effect */
+text-align: center;
+max-width: 95%;
+margin-bottom: 30px;
+border: 3px solid #ff6666; /* Solid vibrant red border */
+position: relative;
+overflow: hidden;
+transform: rotate(-2deg); /* Slightly askew for eccentricity */
+transition: transform 0.3s ease-in-out, box-shadow 0.3s ease;
+}
+
+.game-container:hover, #image-upload-section:hover {
+transform: rotate(0deg) scale(1.01);
+box-shadow: 0 18px 45px rgba(0, 0, 0, 0.95),
+0 0 0 10px rgba(255, 100, 100, 0.5);
+}
+
+/* Maximalist flourishes */
+.game-container::before, #image-upload-section::before {
+content: '';
+position: absolute;
+top: 0;
+left: 0;
+right: 0;
+bottom: 0;
+background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><defs><pattern id="pattern" width="25" height="25" patternUnits="userSpaceOnUse"><circle cx="12.5" cy="12.5" r="8" fill="%236a0000" opacity="0.15" /></pattern></defs><rect x="0" y="0" width="100%" height="100%" fill="url(%23pattern)" /></svg>'); /* Funky circle pattern */
+opacity: 0.3;
+z-index: 0;
+pointer-events: none;
+}
+
+h1 {
+font-family: 'Permanent Marker', cursive; /* Handwritten/graffiti style */
+color: #ff9900; /* Bright orange */
+margin-bottom: 25px;
+font-size: 3.5em; /* Much larger */
+text-shadow: 0 0 20px rgba(255, 153, 0, 0.7), 0 0 40px rgba(255, 153, 0, 0.5); /* Intense orange glow */
+letter-spacing: 3px;
+position: relative;
+z-index: 1;
+transform: skewX(-5deg); /* Slightly slanted for fun */
+animation: title-glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes title-glow {
+from { text-shadow: 0 0 10px rgba(255, 153, 0, 0.5), 0 0 20px rgba(255, 153, 0, 0.3); }
+to { text-shadow: 0 0 20px rgba(255, 153, 0, 0.7), 0 0 40px rgba(255, 153, 0, 0.5); }
+}
+
+h2 {
+font-family: 'Bangers', cursive;
+color: #ffcc00; /* Lighter, fun yellow */
+font-size: 2.2em;
+margin-bottom: 10px;
+z-index: 1;
+position: relative;
+}
+
+.level-info {
+background-color: rgba(68, 0, 0, 0.7); /* Slightly transparent dark maroon */
+padding: 20px;
+border-radius: 10px;
+margin-bottom: 25px;
+border: 2px solid rgba(255, 100, 100, 0.6);
+z-index: 1;
+position: relative;
+animation: pulse-border 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes pulse-border {
+from { border-color: rgba(255, 100, 100, 0.6); }
+to { border-color: rgba(255, 150, 150, 0.9); }
+}
+
+#current-level {
+color: #00ffff; /* Aqua */
+font-weight: bold;
+font-size: 1.5em;
+animation: level-up-text 1s ease-out;
+}
+
+@keyframes level-up-text {
+0% { transform: scale(1); }
+50% { transform: scale(1.2); color: #00ff00; }
+100% { transform: scale(1); color: #00ffff; }
+}
+
+#level-message {
+font-family: 'Press Start 2P', cursive; /* Retro arcade font */
+font-style: normal; /* Override italic */
+color: #aaffaa; /* Light green */
+font-size: 1.2em;
+margin-top: 10px;
+text-shadow: 0 0 8px #aaffaa;
+animation: blink 1s linear infinite;
+}
+
+@keyframes blink {
+50% { opacity: 0.5; }
+}
+
+/* Incorrect Guess Message */
+#wrong-guess-message {
+font-family: 'Permanent Marker', cursive;
+color: #ff0000; /* Bright red for warnings */
+font-size: 1.8em;
+margin-bottom: 20px;
+text-shadow: 0 0 10px rgba(255, 0, 0, 0.7);
+z-index: 2; /* Ensure it's above other elements */
+pointer-events: none; /* Don't interfere with clicks */
+position: relative; /* Changed to relative to flow with content */
+opacity: 0; /* Start hidden */
+transition: opacity 0.3s ease-in-out;
+}
+
+#wrong-guess-message.visible {
+opacity: 1;
+}
+
+@keyframes shake {
+0%, 100% { transform: translateX(0); }
+25% { transform: translateX(-5px); }
+50% { transform: translateX(5px); }
+75% { transform: translateX(-5px); }
+}
+
+/* Game Board & Cards */
+.game-board {
+display: grid;
+gap: 20px; /* Even larger gap */
+margin: 40px auto;
+justify-content: center;
+max-width: 100%;
+z-index: 1;
+position: relative;
+perspective: 1000px; /* For 3D card flip effect */
+}
+
+.card {
+width: 180px; /* Significantly larger cards */
+height: 180px;
+background-color: #550000; /* Darker maroon base */
+border-radius: 15px;
+display: flex;
+justify-content: center;
+align-items: center;
+cursor: pointer;
+transform-style: preserve-3d;
+transition: transform 0.3s ease, box-shadow 0.4s ease; /* Simplified transition */
+position: relative;
+box-shadow: 0 10px 25px rgba(0, 0, 0, 0.8),
+0 0 0 5px #ff6666; /* Vibrant red border */
+}
+
+.card:hover {
+box-shadow: 0 12px 30px rgba(0, 0, 0, 1),
+0 0 0 7px #ffff00; /* Bright yellow hover */
+transform: translateY(-5px); /* Lift up slightly */
+}
+
+.card.flipped .card-inner { /* Apply flip to inner for 3D effect */
+transform: rotateY(180deg);
+}
+
+.card-inner {
+width: 100%;
+height: 100%;
+position: absolute;
+transform-style: preserve-3d;
+/* Changed for smoother, more realistic flip */
+transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.card-front, .card-back {
+width: 100%;
+height: 100%;
+position: absolute;
+backface-visibility: hidden;
+border-radius: 12px;
+display: flex;
+justify-content: center;
+align-items: center;
+border: 3px solid #ff6666; /* Consistent vibrant red border on faces */
+}
+
+.card-front {
+background: linear-gradient(45deg, #880000, #550000); /* Gradient for card back */
+font-family: 'Permanent Marker', cursive;
+font-size: 4.5em; /* Much larger question mark */
+color: #00ffff; /* Aqua question mark */
+text-shadow: 0 0 15px rgba(0, 255, 255, 0.8), 0 0 30px rgba(0, 255, 255, 0.5); /* Stronger glow */
+box-shadow: inset 0 0 15px rgba(0, 255, 255, 0.3);
+
+/* Artistic Design on Card Back */
+background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 100 100"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="%23880000"/><stop offset="100%" stop-color="%23550000"/></linearGradient><pattern id="pattern-cage" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="8" fill="%23cc6600" opacity="0.3"/></pattern></defs><rect x="0" y="0" width="100" height="100" fill="url(%23g)"/><text x="50%" y="55%" font-family="Permanent Marker" font-size="40" fill="%2300ffff" text-anchor="middle" dominant-baseline="middle" stroke="%23ff9900" stroke-width="1.5" opacity="0.8">C</text><rect x="0" y="0" width="100" height="100" fill="url(%23pattern-cage)" opacity="0.4"/></svg>');
+background-size: cover; /* Ensure pattern covers the whole back */
+}
+
+.card-back {
+transform: rotateY(180deg);
+background-color: #ffffff; /* White background for image */
+padding: 10px; /* Larger inner padding for images */
+box-sizing: border-box;
+overflow: hidden;
+}
+
+.card-back img {
+max-width: 100%;
+max-height: 100%;
+border-radius: 10px; /* Slightly more rounded images */
+object-fit: contain;
+border: 2px solid #ddd;
+}
+
+.card.matched .card-inner {
+animation: none; /* Removed pulse animation for matched cards */
+}
+
+.card.matched .card-front {
+background: linear-gradient(45deg, #008800, #005500); /* Vibrant green gradient for matched */
+color: #fff;
+box-shadow: inset 0 0 20px rgba(0, 255, 0, 0.7);
+border-color: #33cc33; /* Lighter green border */
+/* Remove artistic design from matched card backs */
+background-image: none;
+content: '✓'; /* Or any other marker for matched */
+font-size: 4.5em;
+line-height: 1; /* Adjust line height for center alignment */
+}
+
+/* Match Particle Animation */
+.match-effect-container {
+position: absolute;
+top: 50%;
+left: 50%;
+transform: translate(-50%, -50%);
+width: 100%;
+height: 100%;
+pointer-events: none;
+overflow: hidden;
+z-index: 5; /* Above cards */
+}
+
+.match-particle {
+position: absolute;
+background-color: #ffcc00; /* Goldish yellow */
+border-radius: 50%;
+animation: spark-fade-out 1s forwards cubic-bezier(0.25, 0.46, 0.45, 0.94);
+opacity: 0; /* Start hidden */
+}
+
+@keyframes spark-fade-out {
+0% {
+transform: translate(0, 0) scale(1);
+opacity: 1;
+}
+100% {
+transform: translate(var(--x), var(--y)) scale(0);
+opacity: 0;
+}
+}
+
+
+/* Utility Class */
+.hidden {
+display: none !important;
+}
+
+/* Win Message */
+#win-message {
+font-family: 'Press Start 2P', cursive;
+font-size: 6em; /* Extremely large */
+color: #ff00ff; /* Intense fuchsia */
+text-shadow: 0 0 20px #ff00ff, 0 0 40px #ff00ff, 0 0 60px #ff00ff, 0 0 80px #ff00ff;
+animation: pulse 1.2s infinite alternate, neon-glow 1.8s ease-in-out infinite alternate;
+letter-spacing: 5px;
+font-weight: bold;
+text-transform: uppercase;
+text-align: center;
+}
+
+@keyframes pulse {
+from {
+transform: scale(1);
+opacity: 0.8;
+}
+to {
+transform: scale(1.1);
+opacity: 1;
+}
+}
+
+@keyframes neon-glow {
+from {
+text-shadow: 0 0 15px #ff00ff, 0 0 25px #ff00ff, 0 0 35px #ff00ff;
+}
+to {
+text-shadow: 0 0 20px #ff00ff, 0 0 30px #ff00ff, 0 0 50px #ff00ff, 0 0 70px #ff00ff;
+}
+}
+
+/* Buttons */
+#reset-button, #start-game-button {
+background: linear-gradient(45deg, #ff3333, #aa0000); /* Fiery red gradient */
+color: white;
+padding: 18px 35px; /* Even larger buttons */
+border: none;
+border-radius: 10px;
+cursor: pointer;
+font-size: 1.5em; /* Larger font */
+margin-top: 35px;
+box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+transition: background 0.4s ease, transform 0.3s ease, box-shadow 0.4s ease;
+font-family: 'Press Start 2P', cursive; /* Retro arcade font */
+letter-spacing: 2px;
+text-transform: uppercase;
+animation: button-pulse 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes button-pulse {
+from { box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6); }
+to { box-shadow: 0 12px 25px rgba(0, 0, 0, 0.8); }
+}
+
+#reset-button:hover, #start-game-button:hover {
+background: linear-gradient(45deg, #ff6666, #cc3333); /* Lighter on hover */
+transform: translateY(-5px) scale(1.02); /* More prominent lift and slight scale */
+box-shadow: 0 12px 25px rgba(0, 0, 0, 0.8);
+}
+
+#reset-button:disabled, #start-game-button:disabled {
+background: #6a6a6a;
+cursor: not-allowed;
+box-shadow: none;
+transform: none;
+}
+
+/* Image Upload Section */
+#image-upload-section h1 {
+font-size: 2.8em; /* Slightly smaller for instructions */
+}
+#image-upload-section p {
+font-family: 'Bangers', cursive;
+font-size: 1.3em;
+color: #ffdddd;
+margin-bottom: 25px;
+text-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
+}
+
+#file-input {
+margin-top: 30px;
+padding: 12px;
+background-color: #4a0000; /* Darker input background */
+color: #ffe0e0;
+border: 2px solid #ff6666; /* Vibrant red border */
+border-radius: 8px;
+font-family: 'Bangers', cursive;
+font-size: 1.1em;
+}
+/* Style the file input button for better visibility */
+#file-input::-webkit-file-upload-button {
+background: linear-gradient(45deg, #00ffff, #00aaaa); /* Aqua button */
+color: #330000; /* Dark maroon text */
+padding: 10px 20px;
+border: none;
+border-radius: 8px;
+cursor: pointer;
+transition: background 0.3s ease;
+font-family: 'Press Start 2P', cursive;
+font-weight: bold;
+text-transform: uppercase;
+}
+#file-input::-webkit-file-upload-button:hover {
+background: linear-gradient(45deg, #33ffff, #00dddd);
+}
+
+#image-preview-container {
+display: flex;
+flex-wrap: wrap;
+gap: 15px; /* More space for previews */
+margin-top: 35px;
+justify-content: center;
+border: 2px solid rgba(255, 100, 100, 0.5); /* Subtle border for preview area */
+padding: 20px;
+border-radius: 15px;
+background-color: rgba(68, 0, 0, 0.4);
+animation: image-preview-fade-in 1s ease-out;
+}
+
+@keyframes image-preview-fade-in {
+from { opacity: 0; transform: translateY(20px); }
+to { opacity: 1; transform: translateY(0); }
+}
+
+.preview-image {
+width: 100px; /* Slightly larger previews */
+height: 100px;
+object-fit: cover;
+border-radius: 10px;
+border: 4px solid #ff9900; /* Prominent orange border */
+box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.preview-image:hover {
+transform: scale(1.08) rotate(2deg); /* Slight hover effect with rotation */
+box-shadow: 0 6px 15px rgba(0, 0, 0, 0.8);
+}
+
+#upload-message {
+color: #00ffff; /* Aqua message */
+font-family: 'Press Start 2P', cursive;
+font-size: 1.2em;
+margin-top: 20px;
+font-weight: bold;
+text-shadow: 0 0 8px rgba(0, 255, 255, 0.5);
+animation: upload-message-slide-in 1s ease-out;
+}
+
+@keyframes upload-message-slide-in {
+from { transform: translateY(-20px); opacity: 0; }
+to { transform: translateY(0); opacity: 1; }
+}
+
+/* Level Transition Message */
+#level-transition-message {
+font-family: 'Permanent Marker', cursive;
+color: #ffcc00; /* Bright yellow */
+font-size: 3em;
+text-shadow: 0 0 15px rgba(255, 204, 0, 0.8);
+position: fixed;
+top: 50%;
+left: 50%;
+transform: translate(-50%, -50%);
+z-index: 100;
+text-align: center;
+opacity: 0;
+transition: opacity 0.5s ease-in-out;
+background-color: rgba(0, 0, 0, 0.7);
+padding: 30px;
+border-radius: 20px;
+border: 5px solid #ff9900;
+box-shadow: 0 0 30px rgba(255, 204, 0, 0.8);
+animation: level-transition-sparkle 1.5s ease-in-out infinite alternate;
+}
+
+#level-transition-message.visible {
+opacity: 1;
+}
+
+@keyframes level-transition-sparkle {
+0% { transform: translate(-50%, -50%) scale(1); border-color: #ff9900; box-shadow: 0 0 30px rgba(255, 204, 0, 0.8); }
+50% { transform: translate(-50%, -50%) scale(1.02); border-color: #ffff00; box-shadow: 0 0 40px rgba(255, 255, 0, 1); }
+100% { transform: translate(-50%, -50%) scale(1); border-color: #ff9900; box-shadow: 0 0 30px rgba(255, 204, 0, 0.8); }
+}
+
+#level-transition-message span.quote {
+display: block;
+font-family: 'Bangers', cursive;
+font-size: 0.6em;
+color: #00ffff;
+margin-top: 15px;
+}
+#level-transition-message span.chances-bonus {
+display: block;
+font-family: 'Press Start 2P', cursive;
+font-size: 0.5em;
+color: #00ff00;
+margin-top: 10px;
+text-shadow: 0 0 5px #00ff00;
+}
+
+/* Spice Button */
+#spice-button {
+background: linear-gradient(45deg, #ff00ff, #aa00aa); /* Fuchsia gradient */
+color: white;
+padding: 10px 20px;
+border: none;
+border-radius: 8px;
+cursor: pointer;
+font-size: 1.2em;
+margin-bottom: 20px; /* Space above game board */
+box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+font-family: 'Press Start 2P', cursive;
+letter-spacing: 1px;
+text-transform: uppercase;
+display: none; /* Hidden by default */
+}
+
+#spice-button:hover {
+background: linear-gradient(45deg, #ff33ff, #cc00cc);
+transform: translateY(-3px);
+box-shadow: 0 7px 18px rgba(0, 0, 0, 0.6);
+}
+
+#spice-button:disabled {
+background: #6a6a6a;
+cursor: not-allowed;
+box-shadow: none;
+transform: none;
+}
+
+</style>
+</head>
+<body>
+<audio id="flip-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-card-flip-200.mp3" preload="auto"></audio>
+<audio id="match-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-bonus-earned-in-video-game-2055.mp3" preload="auto"></audio>
+<audio id="nomatch-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-negative-game-buzz-2802.mp3" preload="auto"></audio>
+<audio id="win-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-game-level-opened-2009.mp3" preload="auto"></audio>
+<audio id="level-up-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-fast-sci-fi-bleep-1011.mp3" preload="auto"></audio>
+<audio id="game-over-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-arcade-retro-game-over-213.mp3" preload="auto"></audio>
+
+
+<div id="image-upload-section">
+<h1>Upload Your Game Images (A Grand Selection Awaits)</h1>
+<p>For a truly challenging and opulent experience, kindly provide at least 25 unique images. The game's 100 levels yearn for your visual treasures.</p>
+<input type="file" id="file-input" multiple accept="image/*">
+<div id="image-preview-container"></div>
+<p id="upload-message"></p>
+<button id="start-game-button" disabled>Embark on the Memory Grand Tour</button>
+</div>
+
+<div class="game-container hidden" id="game-section">
+<h1>Nicolas Cage's Memory</h1>
+<div class="level-info">
+<h2>Level: <span id="current-level">1</span></h2>
+<p id="lives-info">Chances: <span id="current-lives"></span></p>
+<p id="level-message"></p>
+</div>
+<button id="spice-button" class="hidden">Spice</button> <p id="wrong-guess-message" class="hidden"></p> <div id="game-board" class="game-board">
+</div>
+<button id="reset-button" style="display: none;">Commence a New Grand Tour</button>
+</div>
+
+<div id="win-message" class="hidden">
+<h1>NICOLAS CAGE!</h1>
+</div>
+
+<div id="level-transition-message" class="hidden"></div>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+const fileInput = document.getElementById('file-input');
+const imagePreviewContainer = document.getElementById('image-preview-container');
+const uploadMessage = document.getElementById('upload-message');
+const startGameButton = document.getElementById('start-game-button');
+const imageUploadSection = document.getElementById('image-upload-section');
+const gameSection = document.getElementById('game-section');
+const body = document.body; // Reference to the body for background changes
+
+const gameBoard = document.getElementById('game-board');
+const currentLevelSpan = document.getElementById('current-level');
+const livesInfoSpan = document.getElementById('current-lives');
+const levelMessageElem = document.getElementById('level-message');
+const winMessageElem = document.getElementById('win-message');
+const resetButton = document.getElementById('reset-button');
+const wrongGuessMessageElem = document.getElementById('wrong-guess-message');
+const levelTransitionMessageElem = document.getElementById('level-transition-message');
+const spiceButton = document.getElementById('spice-button'); // New Spice button
+
+// Sound elements
+const flipSound = document.getElementById('flip-sound');
+const matchSound = document.getElementById('match-sound');
+const noMatchSound = document.getElementById('nomatch-sound');
+const winSound = document.getElementById('win-sound');
+const levelUpSound = document.getElementById('level-up-sound');
+const gameOverSound = document.getElementById('game-over-sound'); // New game over sound
+
+let uploadedImageURLs = [];
+let level = 1;
+let cards = [];
+let flippedCards = [];
+let matchedPairs = 0;
+let lockBoard = false;
+let totalPairsPerLevel = 0;
+let availableWrongGuesses = 25; // Initial chances for Level 1
+let currentWrongGuesses = 0; // Wrong guesses in current level
+let wrongGuessCountForSpice = 0; // Track wrong guesses for Spice button
+let initialPreviewTime = 3000; // Starting preview time in milliseconds (3 seconds)
+
+// Difficulty settings: Increased pairs and columns per level (now up to 100 levels)
+const levelSettings = {};
+for (let i = 1; i <= 100; i++) {
+let pairs;
+let columns;
+let bgColor;
+
+if (i <= 35) { // Levels 1-35: Increase pairs and columns
+const basePairs = 4;
+// The existing logic for `pairs` and `columns` is fine, keeping it.
+// Adjusting column calculation to ensure it doesn't get too wide too fast
+pairs = basePairs + (i - 1) * 2;
+
+// Re-evaluating column logic to be more gradual and prevent excessively wide boards
+if (pairs <= 8) columns = 4;
+else if (pairs <= 12) columns = 5;
+else if (pairs <= 18) columns = 6;
+else if (pairs <= 24) columns = 7;
+else if (pairs <= 32) columns = 8;
+else if (pairs <= 40) columns = 9;
+else if (pairs <= 48) columns = 10;
+else if (pairs <= 56) columns = 11;
+else if (pairs <= 64) columns = 12;
+else if (pairs <= 72) columns = 13;
+else if (pairs <= 80) columns = 14;
+else if (pairs <= 88) columns = 15;
+else if (pairs <= 96) columns = 16;
+else columns = 17; // Max columns for these levels
+
+} else { // Levels 36-100: Maintain pairs and columns, increase difficulty by adding rotation/blur
+// For simplicity, let's cap pairs/columns at Level 35 values
+// Or, we can set a fixed large size for the later levels
+pairs = levelSettings[35].pairs; // Keep pairs same as level 35
+columns = levelSettings[35].columns; // Keep columns same as level 35
+// Introduce new difficulty elements later in createBoard or card rendering
+}
+
+// Generate a varying background color for each level
+const hue = (i * 30) % 360; // Cycle through hues
+const saturation = 50 + (i % 50); // Vary saturation
+const lightness = 20 + (i % 20); // Vary lightness
+bgColor = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+
+levelSettings[i] = { pairs, columns, bgColor };
+}
+
+// Nicolas Cage Sarcastic/Judgmental Quotes for wrong guesses
+const nicolasCageWrongGuessQuotes = [
+"That's, uh... that's not it. You have a lot of passion. Unfortunately, no accuracy. (Con Air)",
+"Define 'mistake'. You just did. Magnificently. (Face/Off)",
+"You don't say? Fascinating. Absolutely fascinating, how wrong that was. (Vampire's Kiss)",
+"I'm a vampire. I don't make mistakes. You, however... (Vampire's Kiss)",
+"A bad idea? Or is it a brilliant idea that's just... completely wrong? (Face/Off)",
+"How'd it get burned? How'd it get burned?! Your memory, that's how! (The Wicker Man)",
+"You mean to tell me that was a miscalculation? My, my, how unexpected. (National Treasure)",
+"Could you just... put the bunny back in the box? And maybe rethink your choices? (Con Air)",
+"I'm not insane. The cards are insane. And you're just... not remembering them. (Vampire's Kiss)",
+"NOT THE BEES! Not the right cards! Oh, the agony! (The Wicker Man)",
+"There's no 'us.' There's no 'us' if you keep doing this. Just you. And your wrong choices. (Leaving Las Vegas)",
+"You just took a wrong turn at Albuquerque, didn't you? In your brain, I mean. (G-Force)",
+"I need to take his face... and replace it with the right one. Because you didn't. (Face/Off)",
+"This is a catastrophe! An absolute cinematic disaster, your memory! (Adaptation.)",
+"Is there a wrong button here? Because you seem to be pressing it repeatedly. (The Rock)",
+"I'm a little freaked out. Not by the cards, but by your inability to match them. (Next)",
+"I'm gonna steal... a clue for you. Because clearly, you need one. (National Treasure)",
+"I would not go to a doctor who can't remember where he put his stethoscope. Just saying. (City of Angels)",
+"What do you mean, 'Oh, no'? Oh, no is right! Get it together! (The Wicker Man)",
+"My heart rate is, like, 160 beats per minute because of your wrong answers! (Face/Off)",
+"You call that 'trying'? I call that 'a performance in forgetfulness'. (Adaptation.)",
+"It's like a scene from a bad dream. Or, you know, your memory game. (Dream Scenario)",
+"Are you, uh, feeling alright? Or just... strategically misremembering? (The Family Man)",
+"I could eat a peach for hours. And you could click the wrong cards for hours. (Face/Off)",
+"Let me tell you something about my favorite actor... it's not you, at this rate. (Pig)",
+"That was a bold move. A bold, incorrect move. (Leaving Las Vegas)",
+"I'm not trying to be difficult. I'm just trying to understand how you miss that. (Con Air)",
+"This is not a drill! This is a test of your memory! And you're failing! (The Rock)",
+"Don't worry, it's not you. It's... actually, it's probably you. (Mandy)",
+"You're a professional at making wrong decisions. Congratulations. (Joe)",
+"I'm going to find the secret... to why you're so bad at this. (National Treasure)",
+"You know, for a moment there, I thought you had it. I was wrong. (Pig)",
+"This is a total nightmare. A complete memory-losing nightmare. (Dream Scenario)",
+"I've seen more accurate prophecies in a fortune cookie. (Knowing)",
+"Are you even looking at the cards? Or are you just guessing wildly? (Army of One)",
+"The mind is a terrible thing to waste. And you're doing a fine job of it. (Lord of War)",
+"There's a thin line between genius and madness. You're just... on the wrong side of memory. (Vampire's Kiss)",
+"Why couldn't you just let the cards be? Why the chaos? (The Wicker Man)",
+"I feel like I'm taking crazy pills! Or maybe you are? (Face/Off)",
+"Every single cell in my body is screaming, 'That's wrong!' (Ghost Rider)",
+"It's astounding! Absolutely astounding how consistently you fail! (Wild at Heart)",
+"Your memory is like a sieve. A very, very large sieve. (The Rock)",
+"I'm a little bit of a mess right now, thanks to your poor choices. (Pig)",
+"This isn't a hobby. This is a competition. And you're losing. (The Unbearable Weight of Massive Talent)",
+"I'm just trying to keep my sanity. You're not helping. (Face/Off)",
+"The power of suggestion? I suggest you try harder. (Matchstick Men)",
+"I'm not a betting man, but I'd bet against your next move. (Con Air)",
+"You're making me want to scream. A real, full-throated scream. (Vampire's Kiss)",
+"Is this some kind of performance art? Because it's... certainly something. (The Unbearable Weight of Massive Talent)",
+"You just haven't grasped the fundamental principle of 'matching'. (Leaving Las Vegas)",
+"Oh, you thought that was it? My friend, we have differing definitions of 'it'. (Trespass)",
+"I'm a little confused. Is this a memory game, or a 'forget everything' game? (The Humanity Bureau)",
+"You've chosen... poorly. Very, very poorly. (Season of the Witch)",
+"This is a crime against good memory! (Stolen)",
+"My face! It's reacting to your incorrect choices! (Face/Off)",
+"You're taking this whole 'wild card' thing a bit literally, aren't you? (Wild at Heart)",
+"The world is a vampire, and your memory is bleeding out. (Vampire's Kiss)",
+"I'm not a god, but even I know that wasn't a match. (Ghost Rider)",
+"Perhaps you need a more... *intense* focus. Like mine. (Drive Angry)",
+"You're making a spectacle of yourself, and not the good kind. (The Wicker Man)",
+"I can only assume you're doing this on purpose. Right? (Lord of War)",
+"The spirit of vengeance is not pleased with your memory. (Ghost Rider)",
+"It's not about the money, it's about the memory. And yours is lacking. (National Treasure)",
+"This isn't 'Leaving Las Vegas', it's 'Leaving Your Memory Behind'. (Leaving Las Vegas)",
+"I've got a bad feeling about this... and it's your memory. (Knowing)",
+"Are you seeing what I'm seeing? Because I'm seeing incorrectness. (Pattaya Beach)",
+"You're not just wrong, you're spectacularly wrong. A true artist of error. (The Rock)",
+"I'm searching for answers. Clearly, you are not finding them. (National Treasure: Book of Secrets)",
+"I'm on a mission... to help you remember. (A Score to Settle)",
+"Every wrong click is a personal insult to my cinematic legacy. (The Unbearable Weight of Massive Talent)",
+"The truth is out there, but your cards are not. (Left Behind)",
+"This is a game of memory, not a game of 'close enough'. (Jiu Jitsu)",
+"My patience is wearing thin. Like your chances. (Color Out of Space)",
+"You're like a human reset button for this game. (Prisoners of the Ghostland)",
+"I feel like I'm in a fever dream. A very frustrating fever dream. (Willy's Wonderland)",
+"The universe is conspiring against you. Or maybe it's just your memory. (Grand Isle)",
+"You're testing the limits of my calm. And my sanity. (Pig)",
+"This is not a drill! This is a catastrophic failure of recall. (The Trust)",
+"I've seen less chaos in a room full of pigeons. (Between Worlds)",
+"You're breaking my heart, little memory-gambler. (Running with the Devil)",
+"Are you sure you're not just trying to annoy me? (The Croods)",
+"The spirits are not with you on this one. (Season of the Witch)",
+"I'm a very patient man. But even I have my limits. (Pay the Ghost)",
+"You're making me question everything I know about memory. (Looking Glass)",
+"It's like watching a train wreck, but with less fire and more wrong cards. (Vengeance: A Love Story)",
+"You have a unique talent for incorrectness. (211)",
+"I'm going to need a bigger metaphor for how bad your memory is. (The Old Way)",
+"This isn't 'Next,' this is 'Nope, not next.' (Next)",
+"My eyes are burning from the intensity of your mistakes. (Mandy)",
+"You're playing a dangerous game with my patience. (Dog Eat Dog)",
+"I'm not a mind reader, but I can read your mind. It's saying 'wrong'. (Army of One)",
+"The only thing you're matching is my disappointment. (Kill Chain)",
+"This is a memory game, not a lucky guess game. (Primal)",
+"You're a wild card, and not in a good way. (Color Out of Space)",
+"I could almost admire the consistency of your errors. Almost. (A Violent Separation)",
+"You're like a broken record, constantly playing the wrong tune. (The Wicker Man)",
+"The abyss gazes back, and it's judging your memory. (Mandy)",
+"You're making me want to unleash my inner beast. (Pig)",
+"This is simply... unacceptable. (Face/Off)",
+"My face just contorted in existential dread from that choice. (Vampire's Kiss)",
+"I've endured worse. But not much. (Con Air)",
+"You're not just forgetting, you're actively misremembering. It's a gift. (Adaptation.)",
+"The odds were in your favor, and you still managed to lose. (National Treasure)",
+"I'm genuinely impressed by your ability to get it wrong. (The Wicker Man)",
+"This isn't a performance, it's a lack of performance. (The Unbearable Weight of Massive Talent)",
+"You're making a case for why I should retire. (Leaving Las Vegas)",
+"My very existence is tied to your ability to remember. You're putting me in jeopardy! (Knowing)",
+"The universe has a plan, and your wrong guesses are not part of it. (Next)",
+"You're painting a picture of memory failure. And it's vivid. (Lord of War)",
+"I’ve seen more accurate predictions from a broken clock. (Rage)",
+"This is not how you win. This is how you don't win. (Pay the Ghost)",
+"Your memory is a labyrinth, and you're getting lost. (Arsenal)",
+"I'm trying to be supportive, but your choices are making it difficult. (Between Worlds)",
+"You're missing the forest for the wrong trees. (Running with the Devil)",
+"There's a method to my madness, but yours is just... madness. (Vampire's Kiss)",
+"This is a test. And you're failing it with flair. (Stolen)",
+"I'm a little disappointed, to be honest. (A Score to Settle)",
+"You're playing a dangerous game with my sanity. (Ghost Rider)",
+"The truth is often painful. Like your wrong guesses. (National Treasure: Book of Secrets)",
+"You're a master of distraction. Unfortunately, from the correct answers. (Jiu Jitsu)",
+"My eyes have seen horrors. And now, they've seen that wrong move. (Color Out Of Space)",
+"You're making me want to go full Cage. (Willy's Wonderland)",
+"I'm feeling a sense of unease. Your memory is the culprit. (Grand Isle)",
+"This is not a drill! This is a catastrophic failure of recall. (The Trust)",
+"I've seen less chaos in a room full of pigeons. (Between Worlds)",
+"You're breaking my heart, little memory-gambler. (Running with the Devil)",
+"Are you sure you're not just trying to annoy me? (The Croods)",
+"The spirits are not with you on this one. (Season of the Witch)",
+"I'm a very patient man. But even I have my limits. (Pay the Ghost)",
+"You're making me question everything I know about memory. (Looking Glass)",
+"It's like watching a train wreck, but with less fire and more wrong cards. (Vengeance: A Love Story)",
+"You have a unique talent for incorrectness. (211)",
+"I'm going to need a bigger metaphor for how bad your memory is. (The Old Way)",
+"This isn't 'Next,' this is 'Nope, not next.' (Next)",
+"My eyes are burning from the intensity of your mistakes. (Mandy)",
+"You're playing a dangerous game with my patience. (Dog Eat Dog)",
+"I'm not a mind reader, but I can read your mind. It's saying 'wrong'. (Army of One)",
+"The only thing you're matching is my disappointment. (Kill Chain)",
+"This is a memory game, not a lucky guess game. (Primal)",
+"You're a wild card, and not in a good way. (Color Out of Space)",
+"I could almost admire the consistency of your errors. Almost. (A Violent Separation)",
+"You're like a broken record, constantly playing the wrong tune. (The Wicker Man)",
+"The abyss gazes back, and it's judging your memory. (Mandy)",
+"You're making me want to unleash my inner beast. (Pig)",
+"This is simply... unacceptable. (Face/Off)",
+];
+
+// Nicolas Cage Celebratory Quotes for level completion
+const nicolasCageLevelCompleteQuotes = [
+"Remarkable! Truly, a magnificent display of intellectual prowess! (National Treasure)",
+"You've shown me something extraordinary today. Continue. (Face/Off)",
+"This is a new experience for me. A positive one. (Vampire's Kiss)",
+"A true triumph! You're a walking, talking, memory-matching legend! (Con Air)",
+"My congratulations. You've earned this moment of... non-wrongness. (Adaptation.)",
+"The spirit of this game is pleased. And so am I. (Ghost Rider)",
+"You are, in fact, a national treasure of memory! (National Treasure)",
+"Don't worry, it's not you. It's... actually, it's you. And you're doing great! (Mandy)",
+"I applaud your efforts! And your results. Mostly your results. (Lord of War)",
+"You've exceeded my wildest expectations. Which, granted, were low. (The Unbearable Weight of Massive Talent)",
+"Magnificent! Your memory is like a finely tuned instrument! (Matchstick Men)",
+"This is a glorious moment! A true masterpiece of recall! (Wild at Heart)",
+"You've made me believe in miracles. Small, memory-based miracles. (City of Angels)",
+"The universe has smiled upon your brain! (Knowing)",
+"I'm speechless. Which, for me, is rare. (Face/Off)",
+"You've tamed the chaos! You've mastered the madness! (Vampire's Kiss)",
+"Outstanding! Simply outstanding! (The Rock)",
+"This is the path to greatness. Keep walking. (Pig)",
+"You've proven me wrong. And I rarely enjoy being proven wrong. (Leaving Las Vegas)",
+"The Wicker Man is impressed. And that's saying something. (The Wicker Man)",
+"Your memory is sharp! Like a very, very sharp... thing. (Next)",
+"You've earned the right to gloat. Briefly. (Dream Scenario)",
+"This isn't just winning, it's *winning* with flair! (The Family Man)",
+"My heart sings! A rare occurrence. (Face/Off)",
+"You are a force of nature! A memory-matching hurricane! (Con Air)",
+"Bravo! Encore! (Adaptation.)",
+"I'm not crying. You're crying. Tears of triumph! (The Wicker Man)",
+"The stars align for your memory! (Knowing)",
+"You've achieved what many thought impossible. Including me. (National Treasure)",
+"Simply glorious! A true cinematic performance of memory! (The Unbearable Weight of Massive Talent)",
+"I'm not a betting man, but I'd bet on you now. (Con Air)",
+"You've unleashed the power of your mind! (Ghost Rider)",
+"This is how legends are made. One matched pair at a time. (Lord of War)",
+"You're a true artisan of recall. (Matchstick Men)",
+"The universe is a vast and mysterious place. But your memory is clear. (Knowing)",
+"I'm genuinely impressed. Don't let it go to your head. (Pig)",
+"You've navigated the labyrinth! (National Treasure)",
+"My very soul is uplifted by your success! (Vampire's Kiss)",
+"You've proven that sanity can prevail. Sometimes. (Face/Off)",
+"This is not a dream. This is your undeniable triumph. (Dream Scenario)",
+"A resounding success! You've done the impossible. (The Rock)",
+"You've made me a believer! (City of Angels)",
+"Keep this up, and you might actually be worthy of my screen presence. (The Unbearable Weight of Massive Talent)",
+"The sheer audacity of your excellence! (Wild at Heart)",
+"You're a beacon of memory in a sea of forgetfulness. (Leaving Las Vegas)",
+"Your mind is a wonder! A glorious, beautiful wonder! (Adaptation.)",
+"You're making me question my entire acting philosophy. In a good way. (The Wicker Man)",
+"This is a gift. Embrace it. (Pig)",
+"You've not just won, you've conquered! (National Treasure: Book of Secrets)",
+"The gods of memory salute you! (Ghost Rider)",
+"You've put on a clinic of cognitive prowess! (Jiu Jitsu)",
+"My spirit is soaring with your success! (Color Out of Space)",
+"You are the champion of this memory domain! (Willy's Wonderland)",
+"The universe vibrates with your achievement! (Grand Isle)",
+"Your memory is a fortress! (The Trust)",
+"Less chaos, more matches. Excellent! (Between Worlds)",
+"You've made my heart sing! (Running with the Devil)",
+"You're a true masterpiece of human potential! (The Croods)",
+"The ancient ones are pleased! (Season of the Witch)",
+"You've faced the challenge and emerged victorious! (Pay the Ghost)",
+"Your intellect shines brighter than any star! (Looking Glass)",
+"This is a symphony of correct choices! (Vengeance: A Love Story)",
+"You are the chosen one of memory! (211)",
+"I'm genuinely moved by your dedication and skill. (The Old Way)",
+"This is a monumental achievement! (Next)",
+"My very being resonates with your triumph! (Mandy)",
+"You've navigated the treacherous waters of forgetting! (Dog Eat Dog)",
+"Your mind is a treasure map, and you're finding the X! (National Treasure)",
+"You've matched the impossible! (Kill Chain)",
+"This is not luck, this is pure skill! (Primal)",
+"The colors of the cosmos applaud your recall! (Color Out of Space)",
+"You've brought order to the chaos! (A Violent Separation)",
+"My soul is at peace. For now. (Pig)",
+"You're an inspiration to us all. (Face/Off)",
+"This is the culmination of your memory's power! (Vampire's Kiss)",
+"You've conquered the beast of forgetfulness! (Con Air)",
+"A true performance! A tour de force of memory! (Adaptation.)",
+"The odds were against you, but you prevailed! (National Treasure)",
+"You're a force of nature! A hurricane of correct guesses! (The Wicker Man)",
+"My very cells are vibrating with excitement! (Ghost Rider)",
+"You've created harmony where there was none! (Wild at Heart)",
+"You're making me believe in the power of the human spirit! (The Rock)",
+"This is a moment to savor! (Leaving Las Vegas)",
+"Your memory is a work of art! (Dream Scenario)",
+"You've earned every bit of this success! (The Family Man)",
+"I'm in awe of your abilities! (City of Angels)",
+"You've unlocked the secrets of the cards! (National Treasure)",
+"This is a masterpiece of cognitive function! (The Unbearable Weight of Massive Talent)",
+"You're a legend in the making! (Con Air)",
+"The power of concentration is strong with you! (Matchstick Men)",
+"You're a true memory warrior! (Army of One)",
+"I've seen the future, and it's full of your correct matches! (Next)",
+"Your mind is a formidable weapon! (Mandy)",
+"You've faced the darkness and emerged victorious! (Prisoners of the Ghostland)",
+"The very air crackles with your success! (Color Out of Space)",
+"You've brought joy to my perpetually intense existence! (The Unbearable Weight of Massive Talent)",
+"This is the beginning of a beautiful memory. (Face/Off)",
+"You're the shining example of what a human mind can achieve! (Vampire's Kiss)",
+"I'm not surprised. I always knew you had it in you. (Con Air)",
+"The universe is now a better place because of your memory. (Adaptation.)",
+"You've found the treasure within! (National Treasure)",
+"Truly, a work of art. Your memory is a symphony. (Pig)",
+"The only thing more intense than me is your memory right now. (Mandy)",
+"You've defied expectations and crushed the cards! (The Rock)",
+"This is an opera of perfect matches! (Vampire's Kiss)",
+"You're not just playing, you're performing! (The Unbearable Weight of Massive Talent)",
+];
+
+
+// --- Image Upload Logic ---
+fileInput.addEventListener('change', (event) => {
+uploadedImageURLs = [];
+imagePreviewContainer.innerHTML = '';
+const files = event.target.files;
+
+if (files.length === 0) {
+uploadMessage.textContent = 'No files selected.';
+startGameButton.disabled = true;
+return;
+}
+
+// Updated requirement to 25 unique images, no displayed upper limit.
+// The HTML p tag already reflects "25 unique images" and "100 levels"
+if (files.length < 25) {
+uploadMessage.textContent = `Need at least 25 unique images to play all 100 levels! You have ${files.length}.`;
+startGameButton.disabled = true;
+return;
+} else {
+uploadMessage.textContent = `Ready! You have ${files.length} images.`;
+startGameButton.disabled = false;
+}
+
+// Limit the number of images processed to a reasonable amount, e.g., 200, to prevent performance issues
+// The prompt says "200+ images at the start of game if need be (no need to display this limit though)"
+const maxImagesToProcess = 200;
+Array.from(files).slice(0, maxImagesToProcess).forEach(file => {
+if (file.type.startsWith('image/')) {
+const reader = new FileReader();
+reader.onload = (e) => {
+uploadedImageURLs.push(e.target.result);
+const img = document.createElement('img');
+img.src = e.target.result;
+img.classList.add('preview-image');
+imagePreviewContainer.appendChild(img);
+};
+reader.readAsDataURL(file);
+}
+});
+});
+
+startGameButton.addEventListener('click', () => {
+// Updated alert message for 100 levels
+if (uploadedImageURLs.length < 25) {
+alert("Please upload at least 25 unique images before starting the game to experience all 100 levels!");
+return;
+}
+imageUploadSection.classList.add('hidden');
+gameSection.classList.remove('hidden');
+level = 1;
+currentLevelSpan.textContent = level;
+availableWrongGuesses = 25; // Reset chances for Level 1 when starting a new game
+currentWrongGuesses = 0; // Reset for new game
+wrongGuessCountForSpice = 0; // Reset for new game
+initialPreviewTime = 3000; // Reset initial preview time
+updateLivesDisplay();
+wrongGuessMessageElem.classList.add('hidden'); // Hide message at start
+levelMessageElem.textContent = ""; // Clear level completion message
+spiceButton.classList.add('hidden'); // Hide spice button at start
+createBoard();
+});
+
+// --- Game Logic ---
+function shuffleArray(array) {
+for (let i = array.length - 1; i > 0; i--) {
+const j = Math.floor(Math.random() * (i + 1));
+[array[i], array[j]] = [array[j], array[i]];
+}
+return array;
+}
+
+function updateLivesDisplay() {
+livesInfoSpan.textContent = availableWrongGuesses - currentWrongGuesses;
+}
+
+function createBoard() {
+gameBoard.innerHTML = '';
+flippedCards = [];
+matchedPairs = 0;
+lockBoard = true; // Lock board during preview
+currentWrongGuesses = 0; // Reset wrong guesses for the new level
+wrongGuessCountForSpice = 0; // Reset spice counter for new level
+spiceButton.disabled = true; // Disable spice button at start of level
+updateLivesDisplay(); // Update lives display for new level
+
+if (level >= 11) { // Show Spice button after level 10
+spiceButton.classList.remove('hidden');
+} else {
+spiceButton.classList.add('hidden');
+}
+
+winMessageElem.classList.add('hidden');
+resetButton.style.display = 'none';
+wrongGuessMessageElem.classList.add('hidden'); // Hide message at start of level
+
+const { pairs, columns, bgColor } = levelSettings[level];
+totalPairsPerLevel = pairs;
+
+// Update body background color for the new level
+body.style.background = `linear-gradient(135deg, ${bgColor}, ${darkenColor(bgColor, 20)}, ${lightenColor(bgColor, 20)})`;
+
+// Ensure enough unique images for the current level
+if (uploadedImageURLs.length < totalPairsPerLevel) {
+console.error(`Error: Not enough unique images uploaded for level ${level}. You need at least ${totalPairsPerLevel} unique images.`);
+levelMessageElem.textContent = "Error: Not enough images for this level! Please upload more and restart.";
+lockBoard = true; // Keep board locked if there aren't enough images
+return;
+}
+
+const selectedImages = shuffleArray([...uploadedImageURLs]).slice(0, totalPairsPerLevel);
+cards = [...selectedImages, ...selectedImages];
+shuffleArray(cards);
+
+gameBoard.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
+
+cards.forEach((imageURL, index) => {
+const cardElement = document.createElement('div');
+cardElement.classList.add('card');
+cardElement.dataset.name = imageURL;
+
+cardElement.innerHTML = `
+<div class="card-inner">
+<div class="card-front"></div>
+<div class="card-back">
+<img src="${imageURL}" alt="memory card image">
+</div>
+</div>
+<div class="match-effect-container"></div> `;
+
+cardElement.addEventListener('click', flipCard);
+gameBoard.appendChild(cardElement);
+
+// Apply difficulty changes after level 35
+if (level > 35) {
+const cardBackImage = cardElement.querySelector('.card-back img');
+const rotationAmount = (Math.random() * 6 - 3); // -3 to 3 degrees
+const blurAmount = (level - 35) * 0.1; // Increase blur with level, e.g., 0.1px per level after 35
+
+cardBackImage.style.transform = `rotate(${rotationAmount}deg)`;
+cardBackImage.style.filter = `blur(${blurAmount}px)`;
+}
+});
+
+// Preview phase: Show cards for `initialPreviewTime` seconds
+previewCards(initialPreviewTime);
+}
+
+function previewCards(duration) {
+const allCards = document.querySelectorAll('.card');
+allCards.forEach(card => {
+card.classList.add('flipped');
+});
+
+levelMessageElem.textContent = `Get ready! Level ${level} preview for ${duration / 1000} seconds...`;
+setTimeout(() => {
+allCards.forEach(card => {
+card.classList.remove('flipped');
+});
+lockBoard = false; // Unlock board after preview
+levelMessageElem.textContent = ""; // Clear preview message
+}, duration);
+}
+
+function flipCard() {
+if (lockBoard) return;
+if (this.classList.contains('flipped')) return;
+if (this === flippedCards[0]) return;
+
+this.classList.add('flipped');
+flippedCards.push(this);
+flipSound.currentTime = 0;
+flipSound.play();
+
+if (flippedCards.length === 2) {
+lockBoard = true;
+checkForMatch();
+}
+}
+
+function checkForMatch() {
+const [card1, card2] = flippedCards;
+const isMatch = card1.dataset.name === card2.dataset.name;
+
+if (isMatch) {
+matchSound.currentTime = 0;
+matchSound.play();
+disableCards();
+wrongGuessMessageElem.classList.add('hidden'); // Hide wrong guess message on match
+availableWrongGuesses++; // Add one chance for each correct match
+updateLivesDisplay(); // Update lives display immediately
+createMatchEffect(card1); // Call for card1
+createMatchEffect(card2); // Call for card2
+} else {
+noMatchSound.currentTime = 0;
+noMatchSound.play();
+currentWrongGuesses++;
+wrongGuessCountForSpice++; // Increment spice button counter
+updateLivesDisplay(); // Update lives display immediately
+
+if (level >= 11 && wrongGuessCountForSpice % 3 === 0) {
+spiceButton.disabled = false;
+}
+
+const flipBackDelay = (level >= 1 && level <= 10) ? 1500 : 1000;
+
+setTimeout(() => {
+displayWrongGuessMessage();
+}, 500);
+
+unflipCards(flipBackDelay);
+
+if ((availableWrongGuesses - currentWrongGuesses) <= 0) { // Check if remaining chances are 0 or less
+setTimeout(() => {
+gameOver();
+}, 1500);
+}
+}
+}
+
+function createMatchEffect(cardElement) {
+const container = cardElement.querySelector('.match-effect-container');
+for (let i = 0; i < 20; i++) { // Generate 20 particles
+const particle = document.createElement('div');
+particle.classList.add('match-particle');
+const size = Math.random() * 8 + 4; // Particle size between 4px and 12px
+particle.style.width = `${size}px`;
+particle.style.height = `${size}px`;
+
+const angle = Math.random() * Math.PI * 2; // Random angle in radians
+const distance = Math.random() * 50 + 20; // Distance from center
+const x = Math.cos(angle) * distance;
+const y = Math.sin(angle) * distance;
+
+particle.style.setProperty('--x', `${x}px`);
+particle.style.setProperty('--y', `${y}px`);
+
+// Random initial position within the card
+const startX = Math.random() * 100;
+const startY = Math.random() * 100;
+particle.style.left = `${startX}%`;
+particle.style.top = `${startY}%`;
+
+container.appendChild(particle);
+
+// Remove particle after animation
+particle.addEventListener('animationend', () => {
+particle.remove();
+});
+}
+}
+
+
+function displayWrongGuessMessage() {
+const randomIndex = Math.floor(Math.random() * nicolasCageWrongGuessQuotes.length);
+wrongGuessMessageElem.textContent = nicolasCageWrongGuessQuotes[randomIndex];
+wrongGuessMessageElem.classList.remove('hidden');
+wrongGuessMessageElem.classList.add('visible');
+wrongGuessMessageElem.style.animation = 'shake 0.5s ease-in-out';
+setTimeout(() => {
+wrongGuessMessageElem.classList.remove('visible');
+wrongGuessMessageElem.style.animation = 'none';
+}, 3000);
+}
+
+function disableCards() {
+flippedCards[0].removeEventListener('click', flipCard);
+flippedCards[1].removeEventListener('click', flipCard);
+flippedCards[0].classList.add('matched');
+flippedCards[1].classList.add('matched');
+
+matchedPairs++;
+resetBoard();
+
+if (matchedPairs === totalPairsPerLevel) {
+setTimeout(() => {
+levelComplete();
+}, 800);
+}
+}
+
+function unflipCards(delay) {
+setTimeout(() => {
+flippedCards[0].classList.remove('flipped');
+flippedCards[1].classList.remove('flipped');
+resetBoard();
+}, delay);
+}
+
+function resetBoard() {
+[flippedCards, lockBoard] = [[], false];
+}
+
+function levelComplete() {
+const bonusChances = 1;
+availableWrongGuesses += bonusChances; // Lives carry over and accumulate
+
+updateLivesDisplay();
+
+if (level < Object.keys(levelSettings).length) {
+levelUpSound.currentTime = 0;
+levelUpSound.play();
+
+const randomIndex = Math.floor(Math.random() * nicolasCageLevelCompleteQuotes.length);
+levelTransitionMessageElem.innerHTML = `
+Level Complete!
+<span class="quote">"${nicolasCageLevelCompleteQuotes[randomIndex]}"</span>
+<span class="chances-bonus">+${bonusChances} Chances!</span>
+`;
+levelTransitionMessageElem.classList.remove('hidden');
+levelTransitionMessageElem.classList.add('visible');
+gameSection.classList.add('hidden');
+
+setTimeout(() => {
+level++;
+currentLevelSpan.textContent = level;
+levelTransitionMessageElem.classList.remove('visible');
+levelTransitionMessageElem.classList.add('hidden');
+gameSection.classList.remove('hidden');
+createBoard();
+}, 4000);
+} else {
+gameBoard.innerHTML = '';
+levelMessageElem.textContent = "You actually finished? Wow. Now go tell your therapist. You've earned it.";
+winMessageElem.classList.remove('hidden');
+winSound.currentTime = 0;
+winSound.play();
+resetButton.style.display = 'block';
+}
+}
+
+function gameOver() {
+gameOverSound.currentTime = 0;
+gameOverSound.play();
+alert("Game Over! Too many wrong tries. Nicolas Cage is not impressed. Restarting the game.");
+resetGame(true); // Pass true to retain images
+}
+
+function resetGame(retainImages = false) {
+level = 1;
+currentLevelSpan.textContent = level;
+levelMessageElem.textContent = "";
+wrongGuessMessageElem.classList.add('hidden');
+currentWrongGuesses = 0;
+wrongGuessCountForSpice = 0;
+availableWrongGuesses = 25; // Reset to initial 25 chances on full game reset
+initialPreviewTime = 3000;
+updateLivesDisplay();
+gameSection.classList.add('hidden');
+winMessageElem.classList.add('hidden');
+levelTransitionMessageElem.classList.add('hidden');
+imageUploadSection.classList.remove('hidden');
+spiceButton.classList.add('hidden');
+
+if (!retainImages) {
+fileInput.value = '';
+imagePreviewContainer.innerHTML = '';
+uploadedImageURLs = [];
+uploadMessage.textContent = '';
+startGameButton.disabled = true;
+} else {
+if (uploadedImageURLs.length >= 25) {
+uploadMessage.textContent = `Ready! You have ${uploadedImageURLs.length} images.`;
+startGameButton.disabled = false;
+} else {
+uploadMessage.textContent = `Need at least 25 unique images to play all 100 levels! You have ${uploadedImageURLs.length}.`;
+startGameButton.disabled = true;
+}
+}
+body.style.background = 'linear-gradient(135deg, #4a0000, #2a0000, #6a0000)';
+}
+
+// --- Spice Button Logic ---
+spiceButton.addEventListener('click', () => {
+if (lockBoard) return;
+if (spiceButton.disabled) return;
+
+lockBoard = true;
+spiceButton.disabled = true;
+
+const allCards = document.querySelectorAll('.card');
+allCards.forEach(card => {
+if (!card.classList.contains('matched')) {
+card.classList.add('flipped');
+}
+});
+
+setTimeout(() => {
+allCards.forEach(card => {
+if (!card.classList.contains('matched')) {
+card.classList.remove('flipped');
+}
+});
+lockBoard = false;
+}, 5000);
+});
+
+
+// Helper functions to darken/lighten colors for gradients
+function darkenColor(hexOrHsl, percent) {
+if (hexOrHsl.startsWith('hsl')) {
+let [h, s, l] = hexOrHsl.match(/\d+/g).map(Number);
+l = Math.max(0, l - percent);
+return `hsl(${h}, ${s}%, ${l}%)`;
+} else {
+const f=parseInt(hexOrHsl.slice(1),16),t=percent<0?0:255,p=percent<0?percent*-1:percent,R=f>>16,G=(f>>8)&0x00ff,B=f&0x0000ff;
+return "#"+(0x1000000+(Math.round((t-R)*p/100)+R)*0x10000+(Math.round((t-G)*p/100)+G)*0x100+ (Math.round((t-B)*p/100)+B)).toString(16).slice(1);
+}
+}
+
+function lightenColor(hexOrHsl, percent) {
+return darkenColor(hexOrHsl, -percent);
+}
+
+resetButton.addEventListener('click', () => resetGame(false));
+});
+</script>
+</body>
+</html>
+
+
