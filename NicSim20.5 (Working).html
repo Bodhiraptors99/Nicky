@@ -1,0 +1,2420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nicolas Cage's Memory</title>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Press+Start+2P&family=Permanent+Marker&display=swap" rel="stylesheet">
+<style>
+/* General Body & Container Styling */
+body {
+font-family: 'Bangers', cursive; /* Fun, comic-book style font */
+display: flex;
+justify-content: center;
+align-items: center;
+min-height: 100vh;
+background: linear-gradient(135deg, #4a0000, #2a0000, #6a0000); /* Deep maroon gradient - initial */
+color: #ffe0e0; /* Soft red-pink for text */
+margin: 0;
+flex-direction: column;
+padding: 20px;
+box-sizing: border-box;
+overflow-x: hidden;
+transition: background 0.5s ease; /* Transition for background color changes */
+}
+
+.game-container, #image-upload-section {
+background-color: #330000; /* Darker maroon */
+padding: 40px;
+border-radius: 20px; /* More rounded */
+box-shadow: 0 15px 40px rgba(0, 0, 0, 0.9),
+0 0 0 8px rgba(255, 100, 100, 0.4); /* Vibrant pink-red border effect */
+text-align: center;
+max-width: 95%;
+margin-bottom: 30px;
+border: 3px solid #ff6666; /* Solid vibrant red border */
+position: relative;
+overflow: hidden;
+transition: transform 0.3s ease-in-out, box-shadow 0.3s ease;
+}
+
+.game-container:hover, #image-upload-section:hover {
+transform: scale(1.01); /* Only scale, no rotation */
+box-shadow: 0 18px 45px rgba(0, 0, 0, 0.95),
+0 0 0 10px rgba(255, 100, 100, 0.5);
+}
+
+/* Maximalist flourishes */
+.game-container::before, #image-upload-section::before {
+content: '';
+position: absolute;
+top: 0;
+left: 0;
+right: 0;
+bottom: 0;
+background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><defs><pattern id="pattern" width="25" height="25" patternUnits="userSpaceOnUse"><circle cx="12.5" cy="12.5" r="8" fill="%236a0000" opacity="0.15" /></pattern></defs><rect x="0" y="0" width="100%" height="100%" fill="url(%23pattern)" /></svg>'); /* Funky circle pattern */
+opacity: 0.3;
+z-index: 0;
+pointer-events: none;
+}
+
+h1 {
+font-family: 'Permanent Marker', cursive; /* Handwritten/graffiti style */
+color: #ff9900; /* Bright orange */
+margin-bottom: 25px;
+font-size: 3.5em; /* Much larger */
+text-shadow: 0 0 20px rgba(255, 153, 0, 0.7), 0 0 40px rgba(255, 153, 0, 0.5); /* Intense orange glow */
+letter-spacing: 3px;
+position: relative;
+z-index: 1;
+transform: skewX(-5deg); /* Slightly slanted for fun */
+animation: title-glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes title-glow {
+from { text-shadow: 0 0 10px rgba(255, 153, 0, 0.5), 0 0 20px rgba(255, 153, 0, 0.3); }
+to { text-shadow: 0 0 20px rgba(255, 153, 0, 0.7), 0 0 40px rgba(255, 153, 0, 0.5); }
+}
+
+h2 {
+font-family: 'Bangers', cursive;
+color: #ffcc00; /* Lighter, fun yellow */
+font-size: 2.2em;
+margin-bottom: 10px;
+z-index: 1;
+position: relative;
+}
+
+.level-info {
+background-color: rgba(68, 0, 0, 0.7); /* Slightly transparent dark maroon */
+padding: 20px;
+border-radius: 10px;
+margin-bottom: 25px;
+border: 2px solid rgba(255, 100, 100, 0.6);
+z-index: 1;
+position: relative;
+animation: pulse-border 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes pulse-border {
+from { border-color: rgba(255, 100, 100, 0.6); }
+to { border-color: rgba(255, 150, 150, 0.9); }
+}
+
+#current-level {
+color: #00ffff; /* Aqua */
+font-weight: bold;
+font-size: 1.5em;
+animation: level-up-text 1s ease-out;
+}
+
+@keyframes level-up-text {
+0% { transform: scale(1); }
+50% { transform: scale(1.2); color: #00ff00; }
+100% { transform: scale(1); color: #00ffff; }
+}
+
+#level-message {
+font-family: 'Press Start 2P', cursive; /* Retro arcade font */
+font-style: normal; /* Override italic */
+color: #aaffaa; /* Light green */
+font-size: 1.2em;
+margin-top: 10px;
+text-shadow: 0 0 8px #aaffaa;
+animation: blink 1s linear infinite;
+}
+
+@keyframes blink {
+50% { opacity: 0.5; }
+}
+
+#timer-display {
+font-family: 'Press Start 2P', cursive;
+color: #00ff00; /* Green for timer */
+font-size: 1.5em;
+margin-top: 15px;
+margin-bottom: 15px;
+text-shadow: 0 0 8px #00ff00;
+}
+
+/* Incorrect Guess Message */
+#wrong-guess-message {
+font-family: 'Permanent Marker', cursive;
+color: #ff0000; /* Bright red for warnings */
+font-size: 1.8em;
+margin-bottom: 20px;
+text-shadow: 0 0 10px rgba(255, 0, 0, 0.7);
+z-index: 2; /* Ensure it's above other elements */
+pointer-events: none; /* Don't interfere with clicks */
+position: relative; /* Changed to relative to flow with content */
+opacity: 0; /* Start hidden */
+transition: opacity 0.3s ease-in-out;
+}
+
+#wrong-guess-message.visible {
+opacity: 1;
+}
+
+@keyframes shake {
+0%, 100% { transform: translateX(0); }
+25% { transform: translateX(-5px); }
+50% { transform: translateX(5px); }
+75% { transform: translateX(-5px); }
+}
+
+/* Game Board & Cards */
+.game-board {
+display: grid;
+gap: 20px; /* Even larger gap */
+margin: 40px auto;
+justify-content: center;
+max-width: 100%;
+z-index: 1;
+position: relative;
+perspective: 1000px; /* For 3D card flip effect */
+/* REMOVED fixed max width and height, and overflow: auto */
+/* max-width: 1200px; */
+/* max-height: 800px; */
+/* overflow: auto; */
+/* justify-content: start; */
+}
+
+.card {
+width: 180px; /* Significantly larger cards */
+height: 180px;
+background-color: #550000; /* Darker maroon base */
+border-radius: 15px;
+display: flex;
+justify-content: center;
+align-items: center;
+cursor: pointer;
+transform-style: preserve-3d;
+transition: transform 0.3s ease, box-shadow 0.4s ease; /* Simplified transition */
+position: relative;
+box-shadow: 0 10px 25px rgba(0, 0, 0, 0.8),
+0 0 0 5px #ff6666; /* Vibrant red border */
+}
+
+.card:hover {
+box-shadow: 0 12px 30px rgba(0, 0, 0, 1),
+0 0 0 7px #ffff00; /* Bright yellow hover */
+transform: translateY(-5px); /* Lift up slightly */
+}
+
+/* UPDATED: Card Turn Over Animation */
+.card.flipped .card-inner {
+transform: rotateY(180deg);
+}
+
+.card-inner {
+width: 100%;
+height: 100%;
+position: absolute;
+transform-style: preserve-3d;
+transition: transform 0.4s cubic-bezier(0.4, 0.0, 0.2, 1); /* Smoother, professional flip */
+}
+
+.card-front, .card-back {
+width: 100%;
+height: 100%;
+position: absolute;
+backface-visibility: hidden;
+border-radius: 12px;
+display: flex;
+justify-content: center;
+align-items: center;
+border: 3px solid #ff6666; /* Consistent vibrant red border on faces */
+}
+
+.card-front {
+background: linear-gradient(45deg, #880000, #550000); /* Gradient for card back */
+font-family: 'Permanent Marker', cursive;
+font-size: 4.5em; /* Much larger question mark */
+color: #00ffff; /* Aqua question mark */
+text-shadow: 0 0 15px rgba(0, 255, 255, 0.8), 0 0 30px rgba(0, 255, 255, 0.5); /* Stronger glow */
+box-shadow: inset 0 0 15px rgba(0, 255, 255, 0.3);
+
+/* Updated: Repeating Complicated Pattern for Card Back */
+background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="%23880000"/><stop offset="100%" stop-color="%23550000"/></linearGradient><pattern id="pattern-complicated" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M10 0 L20 10 L10 20 L0 10 Z" fill="%23cc6600" opacity="0.15"/><circle cx="10" cy="10" r="3" fill="%23ff9900" opacity="0.1"/></pattern></defs><rect x="0" y="0" width="100" height="100" fill="url(%23g)"/><rect x="0" y="0" width="100" height="100" fill="url(%23pattern-complicated)" opacity="0.6"/></svg>');
+background-size: cover; /* Ensure pattern covers the whole back */
+}
+
+.card-back {
+transform: rotateY(180deg);
+background-color: #ffffff; /* White background for image */
+padding: 10px; /* Larger inner padding for images */
+box-sizing: border-box;
+overflow: hidden;
+}
+
+.card-back img {
+max-width: 100%;
+max-height: 100%;
+border-radius: 10px; /* Slightly more rounded images */
+object-fit: cover; /* Changed to cover to prevent white borders/cropping issues */
+border: 2px solid #ddd;
+}
+
+.card.matched .card-inner {
+animation: none; /* Removed pulse animation for matched cards */
+}
+
+.card.matched .card-front {
+background: linear-gradient(45deg, #008800, #005500); /* Vibrant green gradient for matched */
+color: #fff;
+box-shadow: inset 0 0 20px rgba(0, 255, 0, 0.7);
+border-color: #33cc33; /* Lighter green border */
+/* Remove artistic design from matched card backs */
+background-image: none;
+content: '✓'; /* Or any other marker for matched */
+font-size: 4.5em;
+line-height: 1; /* Adjust line height for center alignment */
+}
+
+/* Match Zap Animation (Updated to Electricity Path - More encompassing/flamboyant) */
+.match-effect-container {
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+pointer-events: none;
+overflow: hidden;
+z-index: 5; /* Above cards */
+}
+
+.electricity-particle {
+position: absolute;
+width: 15px; /* Bigger sparks */
+height: 15px; /* Bigger sparks */
+background-color: #00ffff; /* Aqua */
+border-radius: 50%;
+opacity: 0;
+animation: electricity-spark 0.3s forwards ease-out;
+}
+
+@keyframes electricity-spark {
+0% {
+transform: scale(0);
+opacity: 1;
+box-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff, 0 0 30px #00ffff; /* Stronger glow */
+}
+100% {
+transform: scale(2); /* Bigger scale */
+opacity: 0;
+}
+}
+
+.electricity-path {
+position: absolute;
+background: linear-gradient(90deg, transparent, #ff00ff, #00ffff, transparent); /* Fuchsia to Aqua */
+height: 5px; /* Thicker path */
+opacity: 0;
+animation: electricity-path-grow 0.6s forwards ease-out;
+}
+
+/* Specific paths for each side of the card */
+.path-top {
+top: 0; left: 0;
+width: 0%;
+animation: electricity-path-grow-width 0.6s forwards ease-out;
+transform-origin: left;
+}
+.path-right {
+top: 0; right: 0;
+height: 0%;
+animation: electricity-path-grow-height 0.6s forwards ease-out;
+transform-origin: top;
+}
+.path-bottom {
+bottom: 0; right: 0;
+width: 0%;
+animation: electricity-path-grow-width 0.6s forwards ease-out;
+transform-origin: right;
+}
+.path-left {
+bottom: 0; left: 0;
+height: 0%;
+animation: electricity-path-grow-height 0.6s forwards ease-out;
+transform-origin: bottom;
+}
+
+@keyframes electricity-path-grow-width {
+0% { width: 0%; opacity: 0.8; }
+100% { width: 100%; opacity: 0.8; }
+}
+@keyframes electricity-path-grow-height {
+0% { height: 0%; opacity: 0.8; }
+100% { height: 100%; opacity: 0.8; }
+}
+
+.explosion-effect {
+position: absolute;
+top: 50%;
+left: 50%;
+width: 0;
+height: 0;
+background: radial-gradient(circle, #ff00ff 0%, #00ffff 50%, transparent 100%);
+border-radius: 50%;
+transform: translate(-50%, -50%) scale(0);
+opacity: 0;
+animation: explosion-scale-fade 0.4s forwards ease-out 0.5s; /* Delay after path */
+}
+
+@keyframes explosion-scale-fade {
+0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+100% { transform: translate(-50%, -50%) scale(2); /* Bigger explosion */ opacity: 0; }
+}
+
+
+/* Utility Class */
+.hidden {
+display: none !important;
+}
+
+/* Win Message */
+#win-message {
+font-family: 'Press Start 2P', cursive;
+font-size: 6em; /* Extremely large */
+color: #ff00ff; /* Intense fuchsia */
+text-shadow: 0 0 20px #ff00ff, 0 0 40px #ff00ff, 0 0 60px #ff00ff, 0 0 80px #ff00ff;
+animation: pulse 1.2s infinite alternate, neon-glow 1.8s ease-in-out infinite alternate;
+letter-spacing: 5px;
+font-weight: bold;
+text-transform: uppercase;
+text-align: center;
+}
+
+@keyframes pulse {
+from {
+transform: scale(1);
+opacity: 0.8;
+}
+to {
+transform: scale(1.1);
+opacity: 1;
+}
+}
+
+@keyframes neon-glow {
+from {
+text-shadow: 0 0 15px #ff00ff, 0 0 25px #ff00ff, 0 0 35px #ff00ff;
+}
+to {
+text-shadow: 0 0 20px #ff00ff, 0 0 30px #ff00ff, 0 0 50px #ff00ff, 0 0 70px #ff00ff;
+}
+}
+
+/* Buttons */
+#reset-button, #start-game-button, #archive-button {
+background: linear-gradient(45deg, #ff3333, #aa0000); /* Fiery red gradient */
+color: white;
+padding: 18px 35px; /* Even larger buttons */
+border: none;
+border-radius: 10px;
+cursor: pointer;
+font-size: 1.5em; /* Larger font */
+margin-top: 35px;
+box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+transition: background 0.4s ease, transform 0.3s ease, box-shadow 0.4s ease;
+font-family: 'Press Start 2P', cursive; /* Retro arcade font */
+letter-spacing: 2px;
+text-transform: uppercase;
+animation: button-pulse 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes button-pulse {
+from { box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6); }
+to { box-shadow: 0 12px 25px rgba(0, 0, 0, 0.8); }
+}
+
+#reset-button:hover, #start-game-button:hover, #archive-button:hover {
+background: linear-gradient(45deg, #ff6666, #cc3333); /* Lighter on hover */
+transform: translateY(-5px) scale(1.02); /* More prominent lift and slight scale */
+box-shadow: 0 12px 25px rgba(0, 0, 0, 0.8);
+}
+
+#reset-button:disabled, #start-game-button:disabled, #archive-button:disabled {
+background: #6a6a6a;
+cursor: not-allowed;
+box-shadow: none;
+transform: none;
+}
+
+/* Restart Button (Top Left) */
+#restart-game-button-top {
+position: absolute;
+top: 20px;
+left: 20px;
+background: linear-gradient(45deg, #007bff, #0056b3);
+color: white;
+padding: 10px 20px;
+border: none;
+border-radius: 8px;
+cursor: pointer;
+font-family: 'Press Start 2P', cursive;
+font-size: 0.9em;
+z-index: 10;
+box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+transition: background 0.3s ease, transform 0.2s ease;
+}
+
+#restart-game-button-top:hover {
+background: linear-gradient(45deg, #0056b3, #003d7a);
+transform: translateY(-2px);
+}
+
+
+/* Image Upload Section */
+#image-upload-section h1 {
+font-size: 2.8em; /* Slightly smaller for instructions */
+}
+#image-upload-section p {
+font-family: 'Bangers', cursive;
+font-size: 1.3em;
+color: #ffdddd;
+margin-bottom: 25px;
+text-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
+}
+
+#file-input {
+margin-top: 30px;
+padding: 12px;
+background-color: #4a0000; /* Darker input background */
+color: #ffe0e0;
+border: 2px solid #ff6666; /* Vibrant red border */
+border-radius: 8px;
+font-family: 'Bangers', cursive;
+font-size: 1.1em;
+}
+/* Style the file input button for better visibility */
+#file-input::-webkit-file-upload-button {
+background: linear-gradient(45deg, #00ffff, #00aaaa); /* Aqua button */
+color: #330000; /* Dark maroon text */
+padding: 10px 20px;
+border: none;
+border-radius: 8px;
+cursor: pointer;
+transition: background 0.3s ease;
+font-family: 'Press Start 2P', cursive;
+font-weight: bold;
+text-transform: uppercase;
+}
+#file-input::-webkit-file-upload-button:hover {
+background: linear-gradient(45deg, #33ffff, #00dddd);
+}
+
+#image-preview-container {
+display: flex;
+flex-wrap: wrap;
+gap: 15px; /* More space for previews */
+margin-top: 35px;
+justify-content: center;
+border: 2px solid rgba(255, 100, 100, 0.5); /* Subtle border for preview area */
+padding: 20px;
+border-radius: 15px;
+background-color: rgba(68, 0, 0, 0.4);
+animation: image-preview-fade-in 1s ease-out;
+}
+
+@keyframes image-preview-fade-in {
+from { opacity: 0; transform: translateY(20px); }
+to { opacity: 1; transform: translateY(0); }
+}
+
+.preview-image {
+width: 100px; /* Slightly larger previews */
+height: 100px;
+object-fit: cover;
+border-radius: 10px;
+border: 4px solid #ff9900; /* Prominent orange border */
+box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.preview-image:hover {
+transform: scale(1.08) rotate(2deg); /* Slight hover effect with rotation */
+box-shadow: 0 6px 15px rgba(0, 0, 0, 0.8);
+}
+
+#upload-message {
+color: #00ffff; /* Aqua message */
+font-family: 'Press Start 2P', cursive;
+font-size: 1.2em;
+margin-top: 20px;
+font-weight: bold;
+text-shadow: 0 0 8px rgba(0, 255, 255, 0.5);
+animation: upload-message-slide-in 1s ease-out;
+}
+
+@keyframes upload-message-slide-in {
+from { transform: translateY(-20px); opacity: 0; }
+to { transform: translateY(0); opacity: 1; }
+}
+
+/* Nic Cage Archive Section */
+#nic-cage-archive {
+margin-top: 30px;
+padding: 20px;
+background-color: rgba(51, 0, 0, 0.7);
+border-radius: 15px;
+border: 2px solid #ff9900;
+/* Centering the archive button */
+display: flex;
+flex-direction: column;
+align-items: center;
+}
+
+#nic-cage-archive h2 {
+font-family: 'Permanent Marker', cursive;
+color: #00ffff;
+font-size: 2em;
+margin-bottom: 20px;
+text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+}
+
+#archive-button {
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 15px;
+padding: 15px 30px;
+margin-top: 20px;
+background: linear-gradient(45deg, #00cc66, #00994d); /* Green gradient */
+color: white;
+font-size: 1.3em;
+}
+
+#archive-button:hover {
+background: linear-gradient(45deg, #00e673, #00b359);
+}
+
+#archive-button img {
+width: 60px;
+height: 60px;
+border-radius: 50%;
+object-fit: cover;
+border: 3px solid #ffcc00;
+box-shadow: 0 0 10px rgba(255, 204, 0, 0.7);
+}
+
+
+/* Level Transition Message */
+#level-transition-message {
+font-family: 'Permanent Marker', cursive;
+color: #ffcc00; /* Bright yellow */
+text-shadow: 0 0 15px rgba(255, 204, 0, 0.8);
+position: fixed;
+top: 50%;
+left: 50%;
+transform: translate(-50%, -50%);
+z-index: 100;
+text-align: center;
+opacity: 0;
+transition: opacity 0.5s ease-in-out;
+background-color: rgba(0, 0, 0, 0.7);
+padding: 50px; /* Bigger padding */
+border-radius: 30px; /* More rounded */
+border: 7px solid #ff9900; /* Thicker border */
+box-shadow: 0 0 40px rgba(255, 204, 0, 0.9); /* Stronger shadow */
+animation: level-transition-sparkle 1.5s ease-in-out infinite alternate;
+width: 70%; /* Increased width */
+max-width: 800px; /* Max width for larger screens */
+}
+
+#level-transition-message.visible {
+opacity: 1;
+}
+
+@keyframes level-transition-sparkle {
+0% { transform: translate(-50%, -50%) scale(1); border-color: #ff9900; box-shadow: 0 0 30px rgba(255, 204, 0, 0.8); }
+50% { transform: translate(-50%, -50%) scale(1.02); border-color: #ffff00; box-shadow: 0 0 40px rgba(255, 255, 0, 1); }
+100% { transform: translate(-50%, -50%) scale(1); border-color: #ff9900; box-shadow: 0 0 30px rgba(255, 204, 0, 0.8); }
+}
+
+#level-transition-message span.quote {
+display: block;
+font-family: 'Bangers', cursive;
+font-size: 0.8em; /* Slightly larger quote */
+color: #00ffff;
+margin-top: 20px; /* More space */
+}
+#level-transition-message span.chances-bonus {
+display: block;
+font-family: 'Press Start 2P', cursive;
+font-size: 0.6em; /* Slightly larger bonus text */
+color: #00ff00;
+margin-top: 15px; /* More space */
+text-shadow: 0 0 8px #00ff00; /* Stronger glow */
+}
+#level-transition-message span.total-chances { /* New style for total chances */
+display: block;
+font-family: 'Press Start 2P', cursive;
+font-size: 0.55em; /* Slightly larger total chances */
+color: #ff9900;
+margin-top: 10px; /* More space */
+text-shadow: 0 0 8px #ff9900; /* Stronger glow */
+}
+#level-transition-message img.transition-gif { /* Style for GIF in transition */
+    margin-top: 30px; /* More space */
+    width: 200px; /* Bigger GIF */
+    height: 200px; /* Bigger GIF */
+    object-fit: contain;
+    border-radius: 15px; /* More rounded */
+    box-shadow: 0 0 20px rgba(255, 255, 0, 0.8); /* Stronger shadow */
+}
+
+
+/* Spice Button */
+#spice-button {
+background: linear-gradient(45deg, #ff00ff, #aa00aa); /* Fuchsia gradient */
+color: white;
+padding: 10px 20px;
+border: none;
+border-radius: 8px;
+cursor: pointer;
+font-size: 1.2em;
+margin-bottom: 20px; /* Space above game board */
+box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+font-family: 'Press Start 2P', cursive;
+letter-spacing: 1px;
+text-transform: uppercase;
+display: none; /* Hidden by default */
+}
+
+#spice-button:hover {
+background: linear-gradient(45deg, #ff33ff, #cc00cc);
+transform: translateY(-3px);
+box-shadow: 0 7px 18px rgba(0, 0, 0, 0.6);
+}
+
+#spice-button:disabled {
+background: #6a6a6a;
+cursor: not-allowed;
+box-shadow: none;
+transform: none;
+}
+
+/* Mobile Mode Toggle Styling */
+#mobile-mode-toggle-container {
+display: flex;
+align-items: center;
+justify-content: center;
+margin-bottom: 20px;
+gap: 10px;
+font-family: 'Bangers', cursive;
+color: #ffcc00;
+font-size: 1.2em;
+}
+
+#mobile-mode-toggle {
+-webkit-appearance: none;
+-moz-appearance: none;
+appearance: none;
+width: 60px;
+height: 30px;
+border-radius: 15px;
+background-color: #6a0000;
+outline: none;
+cursor: pointer;
+position: relative;
+transition: background-color 0.3s;
+}
+
+#mobile-mode-toggle::before {
+content: '';
+position: absolute;
+top: 2px;
+left: 2px;
+width: 26px;
+height: 26px;
+border-radius: 50%;
+background-color: #ff9900;
+transition: transform 0.3s, background-color 0.3s;
+}
+
+#mobile-mode-toggle:checked {
+background-color: #00aaaa;
+}
+
+#mobile-mode-toggle:checked::before {
+transform: translateX(30px);
+background-color: #00ffff;
+}
+
+/* Music and SFX Toggle Buttons */
+.sound-control-button {
+    position: absolute;
+    top: 20px;
+    background: linear-gradient(45deg, #007bff, #0056b3);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 15px;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 1.2em;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+    transition: background 0.3s ease, transform 0.2s ease;
+    z-index: 10;
+    width: 60px; /* Fixed width for consistent sizing */
+    text-align: center;
+}
+
+.sound-control-button:hover {
+    background: linear-gradient(45deg, #0056b3, #003d7a);
+    transform: translateY(-2px);
+}
+
+#music-toggle-button {
+    right: 20px;
+}
+
+#sfx-toggle-button {
+    right: 90px; /* Position next to music button */
+}
+
+
+/* Loading Screen Styles */
+#loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.95);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* Ensure it's on top of everything */
+    color: #ff9900;
+    font-family: 'Permanent Marker', cursive;
+    font-size: 3em;
+    text-shadow: 0 0 20px rgba(255, 153, 0, 0.7);
+    transition: opacity 0.5s ease-out;
+}
+
+#loading-screen.hidden {
+    opacity: 0;
+    pointer-events: none; /* Make it unclickable when hidden */
+}
+
+#loading-screen img {
+    width: 250px;
+    height: 250px;
+    object-fit: contain;
+    margin-bottom: 30px;
+    border-radius: 15px;
+    box-shadow: 0 0 25px rgba(255, 153, 0, 0.8);
+    animation: loading-pulse 1.5s infinite alternate;
+}
+
+@keyframes loading-pulse {
+    from { transform: scale(1); box-shadow: 0 0 20px rgba(255, 153, 0, 0.7); }
+    to { transform: scale(1.05); box-shadow: 0 0 35px rgba(255, 153, 0, 1); }
+}
+
+#loading-screen p {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.6em;
+    color: #00ffff;
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+}
+
+
+/* --- Mobile-First & Mobile Mode Specific Styles --- */
+
+/* General mobile adjustments for screens up to 768px */
+@media (max-width: 768px) {
+body {
+padding: 10px;
+}
+
+.game-container, #image-upload-section {
+padding: 20px;
+border-radius: 15px;
+box-shadow: 0 10px 25px rgba(0, 0, 0, 0.9),
+0 0 0 5px rgba(255, 100, 100, 0.3);
+}
+
+h1 {
+font-size: 2.2em;
+margin-bottom: 15px;
+letter-spacing: 1px;
+}
+
+h2 {
+font-size: 1.5em;
+margin-bottom: 5px;
+}
+
+.level-info {
+padding: 15px;
+margin-bottom: 15px;
+}
+
+#current-level {
+font-size: 1.2em;
+}
+
+#level-message {
+font-size: 0.9em;
+margin-top: 5px;
+}
+
+#timer-display {
+font-size: 1.2em;
+margin-top: 10px;
+margin-bottom: 10px;
+}
+
+#wrong-guess-message {
+font-size: 1.2em;
+margin-bottom: 15px;
+}
+
+.card {
+width: 120px; /* Smaller cards for mobile */
+height: 120px;
+gap: 10px; /* Smaller gap */
+}
+
+.card-front {
+font-size: 3em; /* Smaller question mark */
+}
+
+#reset-button, #start-game-button, #archive-button {
+padding: 12px 25px;
+font-size: 1.2em;
+margin-top: 25px;
+}
+
+#restart-game-button-top {
+font-size: 1.5em;
+top: 10px;
+left: 10px;
+right: 10px;
+padding: 8px 15px;
+}
+
+.sound-control-button {
+    top: 10px;
+    padding: 8px 12px;
+    font-size: 1em;
+}
+#music-toggle-button {
+    right: 10px;
+}
+#sfx-toggle-button {
+    right: 70px;
+}
+
+#image-upload-section h1 {
+font-size: 2em;
+}
+#image-upload-section p {
+font-size: 1em;
+margin-bottom: 15px;
+}
+
+#file-input {
+padding: 8px;
+font-size: 0.9em;
+}
+#file-input::-webkit-file-upload-button {
+padding: 8px 15px;
+}
+
+#image-preview-container {
+gap: 10px;
+margin-top: 25px;
+padding: 15px;
+}
+
+.preview-image {
+width: 70px;
+height: 70px;
+border-width: 2px;
+}
+
+#upload-message {
+font-size: 1em;
+margin-top: 15px;
+}
+
+#win-message {
+font-size: 3em;
+letter-spacing: 2px;
+}
+
+#level-transition-message {
+font-size: 2em;
+padding: 20px;
+border-radius: 15px;
+border-width: 3px;
+width: 90%;
+}
+
+#level-transition-message span.quote {
+font-size: 0.5em;
+margin-top: 10px;
+}
+#level-transition-message span.chances-bonus {
+font-size: 0.4em;
+margin-top: 8px;
+}
+#level-transition-message span.total-chances {
+font-size: 0.35em;
+margin-top: 5px;
+}
+
+#spice-button {
+padding: 8px 15px;
+font-size: 1em;
+margin-bottom: 15px;
+}
+
+#loading-screen img {
+    width: 150px;
+    height: 150px;
+}
+
+#loading-screen p {
+    font-size: 0.5em;
+}
+}
+
+
+/* Specific styles when mobile-mode-active class is on body */
+body.mobile-mode-active {
+/* Adjust overall body layout for mobile-first */
+min-height: auto; /* Allow height to adjust */
+padding: 10px; /* Consistent padding */
+}
+
+body.mobile-mode-active .game-container,
+body.mobile-mode-active #image-upload-section {
+padding: 20px;
+margin-bottom: 15px;
+max-width: 100%; /* Ensure it takes full width */
+transform: none; /* Removed skew */
+box-shadow: 0 5px 15px rgba(0,0,0,0.7), 0 0 0 3px rgba(255, 100, 100, 0.2);
+}
+
+body.mobile-mode-active .game-container::before,
+body.mobile-mode-active #image-upload-section::before {
+opacity: 0.1; /* Subtler pattern in mobile mode */
+}
+
+body.mobile-mode-active h1 {
+font-size: 2em; /* Smaller title */
+margin-bottom: 15px;
+letter-spacing: 1px;
+transform: none; /* Remove skew */
+}
+
+body.mobile-mode-active h2 {
+font-size: 1.4em;
+margin-bottom: 8px;
+}
+
+body.mobile-mode-active .level-info {
+padding: 12px;
+margin-bottom: 15px;
+}
+
+body.mobile-mode-active #current-level {
+font-size: 1.2em;
+}
+
+body.mobile-mode-active #level-message {
+font-size: 0.9em;
+margin-top: 5px;
+}
+
+body.mobile-mode-active #timer-display {
+font-size: 1.1em;
+margin-top: 8px;
+margin-bottom: 8px;
+}
+
+body.mobile-mode-active #wrong-guess-message {
+font-size: 1.1em;
+margin-bottom: 15px;
+}
+
+body.mobile-mode-active .game-board {
+gap: 10px; /* Smaller gap for cards */
+margin: 20px auto;
+max-width: 100%; /* Adjusted for mobile */
+/* REMOVED fixed max height for mobile too */
+/* max-height: 500px; */
+}
+
+body.mobile-mode-active .card {
+width: 80px; /* Even smaller cards for mobile to fit more */
+height: 80px;
+border-radius: 10px;
+box-shadow: 0 5px 10px rgba(0, 0, 0, 0.6), 0 0 0 3px #ff6666;
+}
+body.mobile-mode-active .card:hover {
+transform: none; /* Remove hover lift on mobile */
+box-shadow: 0 5px 10px rgba(0, 0, 0, 0.7), 0 0 0 4px #ffff00;
+}
+
+body.mobile-mode-active .card-front {
+font-size: 2.5em; /* Smaller question mark */
+border-width: 2px;
+}
+body.mobile-mode-active .card-back {
+padding: 5px; /* Smaller inner padding */
+border-width: 2px;
+}
+body.mobile-mode-active .card-back img {
+border-radius: 8px;
+}
+
+body.mobile-mode-active #reset-button,
+body.mobile-mode-active #start-game-button,
+body.mobile-mode-active #archive-button {
+padding: 10px 20px;
+font-size: 1em;
+margin-top: 20px;
+letter-spacing: 1px;
+}
+
+body.mobile-mode-active #image-upload-section h1 {
+font-size: 1.8em;
+}
+body.mobile-mode-active #image-upload-section p {
+font-size: 0.9em;
+margin-bottom: 15px;
+}
+
+body.mobile-mode-active #file-input {
+margin-top: 15px;
+padding: 10px;
+font-size: 0.9em;
+}
+body.mobile-mode-active #file-input::-webkit-file-upload-button {
+padding: 8px 15px;
+font-size: 0.8em;
+}
+
+body.mobile-mode-active #image-preview-container {
+gap: 8px;
+margin-top: 15px;
+padding: 10px;
+}
+
+body.mobile-mode-active .preview-image {
+width: 60px;
+height: 60px;
+border-width: 3px;
+border-radius: 8px;
+}
+body.mobile-mode-active .preview-image:hover {
+transform: none; /* Remove hover effects on mobile */
+box-shadow: none;
+}
+
+body.mobile-mode-active #upload-message {
+font-size: 0.9em;
+margin-top: 15px;
+}
+
+body.mobile-mode-active #win-message {
+font-size: 2em;
+letter-spacing: 1px;
+padding: 10px;
+}
+
+body.mobile-mode-active #level-transition-message {
+font-size: 1.5em;
+padding: 15px;
+border-width: 3px;
+border-radius: 10px;
+}
+
+body.mobile-mode-active #level-transition-message span.quote {
+font-size: 0.45em;
+margin-top: 8px;
+}
+body.mobile-mode-active #level-transition-message span.chances-bonus {
+font-size: 0.4em;
+margin-top: 5px;
+}
+body.mobile-mode-active #level-transition-message span.total-chances {
+font-size: 0.35em;
+margin-top: 3px;
+}
+
+body.mobile-mode-active #spice-button {
+padding: 8px 12px;
+font-size: 0.9em;
+margin-bottom: 10px;
+}
+
+/* Dynamic grid columns for mobile mode based on pairs to avoid tiny cards or too few cards */
+body.mobile-mode-active .game-board[style*="grid-template-columns"] {
+/* This is tricky to override dynamically from JS.
+Best approach is to set mobile columns directly in JS based on pair count,
+or define breakpoints more granularly in CSS for the .game-board */
+}
+</style>
+</head>
+<body>
+<audio id="background-music" src="https://www.dropbox.com/scl/fi/6qej4v3893j4abovmm5ur/Keep-On-Movin-Eric-Krasno.mp3?rlkey=nvf3m3dv7yrkkwqem735bmozm&st=foditp8n&raw=1" loop autoplay></audio>
+<audio id="loading-sound" src="https://www.dropbox.com/scl/fi/2g85eny0rhwihr98jmqgy/Card-Shuffle.mp3?rlkey=j1ie39i1yp49rw9bdys19jdi2&st=us7gsfir&raw=1"></audio> 
+<div id="image-upload-section">
+<h1>Upload Your Game Images Here</h1>
+<p>Upload at least 25 unique images or enter the cage below ;)</p>
+
+<div id="mobile-mode-toggle-container">
+<label for="mobile-mode-toggle">Mobile Mode</label>
+<input type="checkbox" id="mobile-mode-toggle">
+</div>
+
+<input type="file" id="file-input" multiple accept="image/*">
+<div id="image-preview-container"></div>
+<p id="upload-message"></p>
+<button id="start-game-button" disabled>Journey into the Cage</button>
+
+<div id="nic-cage-archive">
+<h2>Nic Cage Archive</h2>
+<button id="archive-button">
+<img src="https://dl.dropboxusercontent.com/scl/fi/8joe2iqak0xs13wzdxz90/NicMemory-00072.jpeg?rlkey=uv8sfkrd9fohv93u9y4v6c8gb&dl=1" alt="Nic Cage Archive Icon">
+Use Nic Cage Archive Images
+</button>
+</div>
+
+</div>
+
+<div class="game-container hidden" id="game-section">
+<button id="restart-game-button-top" style="display: none;">Restart Game</button>
+
+<button id="music-toggle-button" class="sound-control-button">🔊</button>
+<button id="sfx-toggle-button" class="sound-control-button">🔊</button>
+
+
+<h1>Nicolas Cage's Memory</h1>
+<div class="level-info">
+<h2>Level: <span id="current-level">1</span></h2>
+<p id="lives-info">Chances: <span id="current-lives"></span></p>
+<p id="timer-display">Time: 10:00</p>
+<p id="level-message"></p>
+</div>
+<button id="spice-button" class="hidden"></button>
+<p id="wrong-guess-message" class="hidden"></p>
+<div id="game-board" class="game-board">
+</div>
+<button id="reset-button" style="display: none;">Commence a New Grand Tour</button>
+</div>
+
+<div id="win-message" class="hidden">
+<h1>NICOLAS CAGE!</h1>
+</div>
+
+<div id="level-transition-message" class="hidden"></div>
+
+<div id="loading-screen" class="hidden">
+    <img id="loading-gif" src="" alt="Loading...">
+    <p>Shuffling the Cards...</p>
+</div>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+const fileInput = document.getElementById('file-input');
+const imagePreviewContainer = document.getElementById('image-preview-container');
+const uploadMessage = document.getElementById('upload-message');
+const startGameButton = document.getElementById('start-game-button');
+const imageUploadSection = document.getElementById('image-upload-section');
+const gameSection = document.getElementById('game-section');
+const body = document.body; // Reference to the body for background changes
+const mobileModeToggle = document.getElementById('mobile-mode-toggle'); // Mobile mode toggle
+const archiveButton = document.getElementById('archive-button'); // Nic Cage Archive button
+
+const gameBoard = document.getElementById('game-board');
+const currentLevelSpan = document.getElementById('current-level');
+const livesInfoSpan = document.getElementById('current-lives');
+const levelMessageElem = document.getElementById('level-message');
+const winMessageElem = document.getElementById('win-message');
+const resetButton = document.getElementById('reset-button');
+const wrongGuessMessageElem = document.getElementById('wrong-guess-message');
+const levelTransitionMessageElem = document.getElementById('level-transition-message');
+const spiceButton = document.getElementById('spice-button'); // New Spice button
+const timerDisplay = document.getElementById('timer-display'); // Timer display element
+const restartGameButtonTop = document.getElementById('restart-game-button-top'); // New restart button
+
+const backgroundMusic = document.getElementById('background-music');
+const musicToggleButton = document.getElementById('music-toggle-button');
+const sfxToggleButton = document.getElementById('sfx-toggle-button'); // New SFX toggle button
+
+// NEW: Loading Screen elements
+const loadingScreen = document.getElementById('loading-screen');
+const loadingGif = document.getElementById('loading-gif');
+const loadingSound = document.getElementById('loading-sound');
+
+// --- User-customizable sound and GIF links ---
+const customLoadingSoundLink = "https://www.dropbox.com/scl/fi/2g85eny0rhwihr98jmqgy/Card-Shuffle.mp3?rlkey=j1ie39i1yp49rw9bdys19jdi2&st=us7gsfir&raw=1"; // Replace with your loading sound link
+const customLoadingGifLink = "https://www.dropbox.com/scl/fi/bqjpflqwwr74wpp6s4ysd/Nicage-gif-1.gif?rlkey=j473itizeptnfii5m29txuxkh&st=6o0vzpdt&raw=1"; // Replace with your loading GIF link
+// --- End of user-customizable section ---
+
+loadingSound.src = customLoadingSoundLink; // Corrected to use GIF for visual loading
+loadingGif.src = customLoadingGifLink;
+
+
+// Sound elements - Now arrays for multiple random sounds
+const flipSounds = [
+    "https://www.dropbox.com/scl/fi/tlreiu86rk1oni0f4icd5/Card-Flip-2.mp3?rlkey=wovn62kybbq6b9rnfoy6dobkm&st=894d4tbq&raw=1",
+    "https://dl.dropboxusercontent.com/scl/fi/4lzb3pl6f3fzacm5meory/Card-Flip-1.mp3?rlkey=a25xje0gbfrgy0x3656m4laj3&dl=1" // Original flip sound
+];
+const matchSounds = [
+    "https://www.dropbox.com/scl/fi/y2o1b55hqzai8vnkssjv8/wow-correct-match.mp3?rlkey=yp2v7iokgzhbgq4saihaa2co7&st=ggvnv3tn&raw=1",
+    "https://www.dropbox.com/scl/fi/hs60347nv4d7d1y4bi4gy/correct-match-Congradulations-your-human.mp3?rlkey=aje18d8brcmppx61m9hgttong&st=wr5pr0vr&raw=1",
+    "https://dl.dropboxusercontent.com/scl/fi/9nix5b984se7znxq1qhgg/Nicolas-Cage-Yeah-Correct-match.mp3?rlkey=pvppfxmdashad9xgwxvfel7iy&dl=1" // Original match sound
+];
+const noMatchSounds = [
+    "https://www.dropbox.com/scl/fi/u1ivplejkha1031vbir3a/wrong-match-awww.mp3?rlkey=6ricspfqj2rj1pmqw8bl2hh1k&st=iu0ovxch&raw=1",
+    "https://www.dropbox.com/scl/fi/dkhwva8rcv2l9k21volua/oh-god-wrong-match.mp3?rlkey=l7wuve54d6iv3bhj6sxlaodj6&st=hpqx4a0k&raw=1",
+    "https://www.dropbox.com/scl/fi/mnqwi7i5v6o25nmsd6b4p/i-dont-remember-wrong-match.mp3?rlkey=4ym3yeg2f39zy4tgrxppg6tha&st=h5w6pubn&raw=1",
+    "https://dl.dropboxusercontent.com/scl/fi/kmn64gns7cpa6h46m430x/no-wrong-match-nic.mp3?rlkey=e7tjynml7hcdilx7kyhlctkiq&dl=1" // Original no-match sound
+];
+const winSounds = [
+    "https://dl.dropboxusercontent.com/scl/fi/1zfid4t1qpcb2awsiznem/Victory-sound-effect-button-sound-effect.mp3?rlkey=12w2fdj9dag7gdyvisaavnvjb&dl=1" // Original win sound (now level up)
+];
+const levelUpSounds = [ // Using the win sounds for level up as per your previous script's use
+    "https://www.dropbox.com/scl/fi/5gjvhwux14oeqb94517uv/Winning-Sound-Effect-1.mp3?rlkey=ux6re9bb1bszpmjiurp3iv1jc&st=7f17193p&raw=1",
+    "https://dl.dropboxusercontent.com/scl/fi/1zfid4t1qpcb2awsiznem/Victory-sound-effect-button-sound-effect.mp3?rlkey=12w2fdj9dag7gdyvisaavnvjb&dl=1"
+];
+const gameOverSounds = [
+    "https://dl.dropboxusercontent.com/scl/fi/1grc6zrxthbmg6tet7sqh/omg-game-over-nic.mp3?rlkey=z1eur77264soiu8sow2o3eo8x&dl=1" // Original game over sound
+];
+
+let sfxVolume = 1.0; // Default SFX volume (1.0 = full)
+const sfxVolumeLevels = [0.0, 0.25, 0.5, 0.75, 1.0]; // Off, Low, Medium, High, Full
+let currentSfxVolumeIndex = 4; // Start at full volume
+
+let musicVolume = 0.5; // Default music volume
+const musicVolumeLevels = [0.0, 0.25, 0.5, 0.75, 1.0]; // Off, Low, Medium, High, Full
+let currentMusicVolumeIndex = 2; // Start at medium volume
+
+
+// Helper to play a random sound from an array
+function playRandomSound(soundArray, type = 'sfx') {
+    let volume;
+    if (type === 'sfx') {
+        volume = sfxVolume;
+    } else if (type === 'music') {
+        // Music volume is handled by backgroundMusic.volume, not this function
+        return;
+    }
+
+    if (volume > 0) {
+        const randomIndex = Math.floor(Math.random() * soundArray.length);
+        const audio = new Audio(soundArray[randomIndex]);
+        audio.volume = volume;
+        audio.play().catch(e => console.warn("Audio play failed:", e)); // Catch and log errors
+    }
+}
+
+let uploadedImageURLs = [];
+let level = 1;
+let cards = [];
+let flippedCards = [];
+let matchedPairs = 0;
+let lockBoard = false;
+let totalPairsPerLevel = 0;
+let availableWrongGuesses = 25; // Initial chances for Level 1, now cumulative
+let currentWrongGuesses = 0; // Wrong guesses in current level
+let wrongGuessCountForSpice = 0; // Track wrong guesses for Spice button
+let initialPreviewTime = 3000; // Starting preview time in milliseconds (3 seconds)
+
+let timerInterval;
+const LEVEL_TIME_LIMIT = 10 * 60; // 10 minutes in seconds
+
+// Difficulty settings: Levels stop adding cards after level 4
+const levelSettings = {};
+for (let i = 1; i <= 100; i++) {
+    let pairs;
+    let columns;
+    let bgColor;
+
+    if (i <= 4) { // Levels 1-4: Increase pairs and columns
+        const basePairs = 4;
+        pairs = basePairs + (i - 1) * 2;
+
+        if (pairs <= 8) columns = 4;
+        else if (pairs <= 12) columns = 5;
+        else columns = 6; // Cap for initial levels
+    } else { // Levels 5-100: Maintain pairs and columns as Level 4
+        pairs = levelSettings[4].pairs;
+        columns = levelSettings[4].columns;
+    }
+
+    // Generate a varying background color for each level
+    const hue = (i * 30) % 360; // Cycle through hues
+    const saturation = 50 + (i % 50); // Vary saturation
+    const lightness = 20 + (i % 20); // Vary lightness
+    bgColor = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+
+    levelSettings[i] = { pairs, columns, bgColor };
+}
+
+// Nicolas Cage Sarcastic/Judgmental Quotes for wrong guesses
+const nicolasCageWrongGuessQuotes = [
+"That's, uh... that's not it. You have a lot of passion. Unfortunately, no accuracy. (Con Air)",
+"Define 'mistake'. You just did. Magnificently. (Face/Off)",
+"You don't say? Fascinating. Absolutely fascinating, how wrong that was. (Vampire's Kiss)",
+"I'm a vampire. I don't make mistakes. You, however... (Vampire's Kiss)",
+"A bad idea? Or is it a brilliant idea that's just... completely wrong? (Face/Off)",
+"How'd it get burned? How'd it get burned?! Your memory, that's how! (The Wicker Man)",
+"You mean to tell me that was a miscalculation? My, my, how unexpected. (National Treasure)",
+"Could you just... put the bunny back in the box? And maybe rethink your choices? (Con Air)",
+"I'm not insane. The cards are insane. And you're just... not remembering them. (Vampire's Kiss)",
+"NOT THE BEES! Not the right cards! Oh, the agony! (The Wicker Man)",
+"There's no 'us.' There's no 'us' if you keep doing this. Just you. And your wrong choices. (Leaving Las Vegas)",
+"You just took a wrong turn at Albuquerque, didn't you? In your brain, I mean. (G-Force)",
+"I need to take his face... and replace it with the right one. Because you didn't. (Face/Off)",
+"This is a catastrophe! An absolute cinematic disaster, your memory! (Adaptation.)",
+"Is there a wrong button here? Because you seem to be pressing it repeatedly. (The Rock)",
+"I'm a little freaked out. Not by the cards, but by your inability to match them. (Next)",
+"I'm gonna steal... a clue for you. Because clearly, you need one. (National Treasure)",
+"I would not go to a doctor who can't remember where he put his stethoscope. Just saying. (City of Angels)",
+"What do you mean, 'Oh, no'? Oh, no is right! Get it together! (The Wicker Man)",
+"My heart rate is, like, 160 beats per minute because of your wrong answers! (Face/Off)",
+"You call that 'trying'? I call that 'a performance in forgetfulness'. (Adaptation.)",
+"It's like a scene from a bad dream. Or, you know, your memory game. (Dream Scenario)",
+"Are you, uh, feeling alright? Or just... strategically misremembering? (The Family Man)",
+"I could eat a peach for hours. And you could click the wrong cards for hours. (Face/Off)",
+"Let me tell you something about my favorite actor... it's not you, at this rate. (Pig)",
+"That was a bold move. A bold, incorrect move. (Leaving Las Vegas)",
+"I'm not trying to be difficult. I'm just trying to understand how you miss that. (Con Air)",
+"This is not a drill! This is a test of your memory! And you're failing! (The Rock)",
+"Don't worry, it's not you. It's... actually, it's probably you. (Mandy)",
+"You're a professional at making wrong decisions. Congratulations. (Joe)",
+"I'm going to find the secret... to why you're so bad at this. (National Treasure)",
+"You know, for a moment there, I thought you had it. I was wrong. (Pig)",
+"This is a total nightmare. A complete memory-losing nightmare. (Dream Scenario)",
+"I've seen more accurate prophecies in a fortune cookie. (Knowing)",
+"Are you even looking at the cards? Or are you just guessing wildly? (Army of One)",
+"The mind is a terrible thing to waste. And you're doing a fine job of it. (Lord of War)",
+"There's a thin line between genius and madness. You're just... on the wrong side of memory. (Vampire's Kiss)",
+"Why couldn't you just let the cards be? Why the chaos? (The Wicker Man)",
+"I feel like I'm taking crazy pills! Or maybe you are? (Face/Off)",
+"Every single cell in my body is screaming, 'That's wrong!' (Ghost Rider)",
+"It's astounding! Absolutely astounding, how consistently you fail! (Wild at Heart)",
+"Your memory is like a sieve. A very, very large sieve. (The Rock)",
+"I'm a little bit of a mess right now, thanks to your poor choices. (Pig)",
+"This isn't a hobby. This is a competition. And you're losing. (The Unbearable Weight of Massive Talent)",
+"I'm just trying to keep my sanity. You're not helping. (Face/Off)",
+"The power of suggestion? I suggest you try harder. (Matchstick Men)",
+"I'm not a betting man, but I'd bet against your next move. (Con Air)",
+"You're making me want to scream. A real, full-throated scream. (Vampire's Kiss)",
+"Is this some kind of performance art? Because it's... certainly something. (The Unbearable Weight of Massive Talent)",
+"You just haven't grasped the fundamental principle of 'matching'. (Leaving Las Vegas)",
+"Oh, you thought that was it? My friend, we have differing definitions of 'it'. (Trespass)",
+"I'm a little confused. Is this a memory game, or a 'forget everything' game? (The Humanity Bureau)",
+"You've chosen... poorly. Very, very poorly. (Season of the Witch)",
+"This is a crime against good memory! (Stolen)",
+"My face! It's reacting to your incorrect choices! (Face/Off)",
+"You're taking this whole 'wild card' thing a bit literally, aren't you? (Wild at Heart)",
+"The world is a vampire, and your memory is bleeding out. (Vampire's Kiss)",
+"I'm not a god, but even I know that wasn't a match. (Ghost Rider)",
+"Perhaps you need a more... *intense* focus. Like mine. (Drive Angry)",
+"You're making a spectacle of yourself, and not the good kind. (The Wicker Man)",
+"I can only assume you're doing this on purpose. Right? (Lord of War)",
+"The spirit of vengeance is not pleased with your memory. (Ghost Rider)",
+"It's not about the money, it's about the memory. And yours is lacking. (National Treasure)",
+"This isn't 'Leaving Las Vegas', it's 'Leaving Your Memory Behind'. (Leaving Las Vegas)",
+"I've got a bad feeling about this... and it's your memory. (Knowing)",
+"Are you seeing what I'm seeing? Because I'm seeing incorrectness. (Pattaya Beach)",
+"You're not just wrong, you're spectacularly wrong. A true artist of error. (The Rock)",
+"I'm searching for answers. Clearly, you are not finding them. (National Treasure: Book of Secrets)",
+"I'm on a mission... to help you remember. (A Score to Settle)",
+"Every wrong click is a personal insult to my cinematic legacy. (The Unbearable Weight of Massive Talent)",
+"The truth is out there, but your cards are not. (Left Behind)",
+"This is a game of memory, not a game of 'close enough'. (Jiu Jitsu)",
+"My patience is wearing thin. Like your chances. (Color Out of Space)",
+"You're like a human reset button for this game. (Prisoners of the Ghostland)",
+"I feel like I'm in a fever dream. A very frustrating fever dream. (Willy's Wonderland)",
+"The universe is conspiring against you. Or maybe it's just your memory. (Grand Isle)",
+"You're testing the limits of my calm. And my sanity. (Pig)",
+"This is not a drill! This is a catastrophic failure of recall. (The Trust)",
+"I've seen less chaos in a room full of pigeons. (Between Worlds)",
+"You're breaking my heart, little memory-gambler. (Running with the Devil)",
+"Are you sure you're not just trying to annoy me? (The Croods)",
+"The spirits are not with you on this one. (Season of the Witch)",
+"I'm a very patient man. But even I have my limits. (Pay the Ghost)",
+"You're making me question everything I know about memory. (Looking Glass)",
+"It's like watching a train wreck, but with less fire and more wrong cards. (Vengeance: A Love Story)",
+"You have a unique talent for incorrectness. (211)",
+"I'm going to need a bigger metaphor for how bad your memory is. (The Old Way)",
+"This isn't 'Next,' this is 'Nope, not next.' (Next)",
+"My eyes are burning from the intensity of your mistakes. (Mandy)",
+"You're playing a dangerous game with my patience. (Dog Eat Dog)",
+"I'm not a mind reader, but I can read your mind. It's saying 'wrong'. (Army of One)",
+"The only thing you're matching is my disappointment. (Kill Chain)",
+"This is a memory game, not a lucky guess game. (Primal)",
+"You're a wild card, and not in a good way. (Color Out of Space)",
+"I could almost admire the consistency of your errors. Almost. (A Violent Separation)",
+"You're like a broken record, constantly playing the wrong tune. (The Wicker Man)",
+"The abyss gazes back, and it's judging your memory. (Mandy)",
+"You're making me want to unleash my inner beast. (Pig)",
+"This is simply... unacceptable. (Face/Off)",
+"My face just contorted in existential dread from that choice. (Vampire's Kiss)",
+"I've endured worse. But not much. (Con Air)",
+"You're not just forgetting, you're actively misremembering. It's a gift. (Adaptation.)",
+"The odds were in your favor, and you still managed to lose. (National Treasure)",
+"I'm genuinely impressed by your ability to get it wrong. (The Wicker Man)",
+"This isn't a performance, it's a lack of performance. (The Unbearable Weight of Massive Talent)",
+"You're making a case for why I should retire. (Leaving Las Vegas)",
+"My very existence is tied to your ability to remember. You're putting me in jeopardy! (Knowing)",
+"The universe has a plan, and your wrong guesses are not part of it. (Next)",
+"You're painting a picture of memory failure. And it's vivid. (Lord of War)",
+"I’ve seen more accurate predictions from a fortune cookie. (Rage)",
+"This is not how you win. This is how you don't win. (Pay the Ghost)",
+"Your memory is a labyrinth, and you're getting lost. (Arsenal)",
+"I'm trying to be supportive, but your choices are making it difficult. (Between Worlds)",
+"You're missing the forest for the wrong trees. (Running with the Devil)",
+"There's a method to my madness, but yours is just... madness. (Vampire's Kiss)",
+"This is a test. And you're failing it with flair. (Stolen)",
+"I'm a little disappointed, to be honest. (A Score to Settle)",
+"You're playing a dangerous game with my sanity. (Ghost Rider)",
+"The truth is often painful. Like your wrong guesses. (National Treasure: Book of Secrets)",
+"You're a master of distraction. Unfortunately, from the correct answers. (Jiu Jitsu)",
+"My eyes have seen horrors. And now, they've seen that wrong move. (Color Out Of Space)",
+"You're making me want to go full Cage. (Willy's Wonderland)",
+"I'm feeling a sense of unease. Your memory is the culprit. (Grand Isle)",
+"This is not a drill! This is a catastrophic failure of recall. (The Trust)",
+"I've seen less chaos in a room full of pigeons. (Between Worlds)",
+"You're breaking my heart, little memory-gambler. (Running with the Devil)",
+"Are you sure you're not just trying to annoy me? (The Croods)",
+"The spirits are not with you on this one. (Season of the Witch)",
+"I'm a very patient man. But even I have my limits. (Pay the Ghost)",
+"You're making me question everything I know about memory. (Looking Glass)",
+"It's like watching a train wreck, but with less fire and more wrong cards. (Vengeance: A Love Story)",
+"You have a unique talent for incorrectness. (211)",
+"I'm going to need a bigger metaphor for how bad your memory is. (The Old Way)",
+"This isn't 'Next,' this is 'Nope, not next.' (Next)",
+"My eyes are burning from the intensity of your mistakes. (Mandy)",
+"You're playing a dangerous game with my patience. (Dog Eat Dog)",
+"I'm not a mind reader, but I can read your mind. It's saying 'wrong'. (Army of One)",
+"The only thing you're matching is my disappointment. (Kill Chain)",
+"This is a memory game, not a lucky guess game. (Primal)",
+"You're a wild card, and not in a good way. (Color Out of Space)",
+"I could almost admire the consistency of your errors. Almost. (A Violent Separation)",
+"You're like a broken record, constantly playing the wrong tune. (The Wicker Man)",
+"The abyss gazes back, and it's judging your memory. (Mandy)",
+"You're making me want to unleash my inner beast. (Pig)",
+"This is simply... unacceptable. (Face/Off)",
+];
+
+// Nicolas Cage Celebratory Quotes for level completion
+const nicolasCageLevelCompleteQuotes = [
+"Remarkable! Truly, a magnificent display of intellectual prowess! (National Treasure)",
+"You've shown me something extraordinary today. Continue. (Face/Off)",
+"This is a new experience for me. A positive one. (Vampire's Kiss)",
+"A true triumph! You're a walking, talking, memory-matching legend! (Con Air)",
+"My congratulations. You've earned this moment of... non-wrongness. (Adaptation.)",
+"The spirit of this game is pleased. And so am I. (Ghost Rider)",
+"You are, in fact, a national treasure of memory! (National Treasure)",
+"Don't worry, it's not you. It's... actually, it's you. And you're doing great! (Mandy)",
+"I applaud your efforts! And your results. Mostly your results. (Lord of War)",
+"You've exceeded my wildest expectations. Which, granted, were low. (The Unbearable Weight of Massive Talent)",
+"Magnificent! Your memory is like a finely tuned instrument! (Matchstick Men)",
+"This is a glorious moment! A true masterpiece of recall! (Wild at Heart)",
+"You've made me believe in miracles. Small, memory-based miracles. (City of Angels)",
+"The universe has smiled upon your brain! (Knowing)",
+"I'm speechless. Which, for me, is rare. (Face/Off)",
+"You've tamed the chaos! You've mastered the madness! (Vampire's Kiss)",
+"Outstanding! Simply outstanding! (The Rock)",
+"This is the path to greatness. Keep walking. (Pig)",
+"You've proven me wrong. And I rarely enjoy being proven wrong. (Leaving Las Vegas)",
+"The Wicker Man is impressed. And that's saying something. (The Wicker Man)",
+"Your memory is sharp! Like a very, very sharp... thing. (Next)",
+"You've earned the right to gloat. Briefly. (Dream Scenario)",
+"This isn't just winning, it's *winning* with flair! (The Family Man)",
+"My heart sings! A rare occurrence. (Face/Off)",
+"You are a force of nature! A memory-matching hurricane! (Con Air)",
+"Bravo! Encore! (Adaptation.)",
+"I'm not crying. You're crying. Tears of triumph! (The Wicker Man)",
+"The stars align for your memory! (Knowing)",
+"You've achieved what many thought impossible. Including me. (National Treasure)",
+"Simply glorious! A true cinematic performance of memory! (The Unbearable Weight of Massive Talent)",
+"I'm not a betting man, but I'd bet on you now. (Con Air)",
+"You've unleashed the power of your mind! (Ghost Rider)",
+"This is how legends are made. One matched pair at a time. (Lord of War)",
+"You're a true artisan of recall. (Matchstick Men)",
+"The universe is a vast and mysterious place. But your memory is clear. (Knowing)",
+"I'm genuinely impressed. Don't let it go to your head. (Pig)",
+"You've navigated the labyrinth! (National Treasure)",
+"My very soul is uplifted by your success! (Vampire's Kiss)",
+"You've proven that sanity can prevail. Sometimes. (Face/Off)",
+"This is not a dream. This is your undeniable triumph. (Dream Scenario)",
+"A resounding success! You've done the impossible. (The Rock)",
+"You've made me a believer! (City of Angels)",
+"Keep this up, and you might actually be worthy of my screen presence. (The Unbearable Weight of Massive Talent)",
+"The sheer audacity of your excellence! (Wild at Heart)",
+"You're a beacon of memory in a sea of forgetfulness. (Leaving Las Vegas)",
+"Your mind is a wonder! A glorious, beautiful wonder! (Adaptation.)",
+"You're making me question my entire acting philosophy. In a good way. (The Wicker Man)",
+"This is a gift. Embrace it. (Pig)",
+"You've not just won, you've conquered! (National Treasure: Book of Secrets)",
+"The gods of memory salute you! (Ghost Rider)",
+"You've put on a clinic of cognitive prowess! (Jiu Jitsu)",
+"My spirit is soaring with your success! (Color Out of Space)",
+"You are the champion of this memory domain! (Willy's Wonderland)",
+"The universe vibrates with your achievement! (Grand Isle)",
+"Your memory is a fortress! (The Trust)",
+"Less chaos, more matches. Excellent! (Between Worlds)",
+"You've made my heart sing! (Running with the Devil)",
+"You're a true masterpiece of human potential! (The Croods)",
+"The ancient ones are pleased! (Season of the Witch)",
+"You've faced the challenge and emerged victorious! (Pay the Ghost)",
+"Your intellect shines brighter than any star! (Looking Glass)",
+"This is a symphony of correct choices! (Vengeance: A Love Story)",
+"You are the chosen one of memory! (211)",
+"I'm genuinely moved by your dedication and skill. (The Old Way)",
+"This is a monumental achievement! (Next)",
+"My very being resonates with your triumph! (Mandy)",
+"You've navigated the treacherous waters of forgetting! (Dog Eat Dog)",
+"Your mind is a treasure map, and you're finding the X! (National Treasure)",
+"You've matched the impossible! (Kill Chain)",
+"This is not luck, this is pure skill! (Primal)",
+"The colors of the cosmos applaud your recall! (Color Out of Space)",
+"You've brought order to the chaos! (A Violent Separation)",
+"My soul is at peace. For now. (Pig)",
+"You're an inspiration to us all. (Face/Off)",
+"This is the culmination of your memory's power! (Vampire's Kiss)",
+"You've conquered the beast of forgetfulness! (Con Air)",
+"A true performance! A tour de force of memory! (Adaptation.)",
+"The odds were against you, but you prevailed! (National Treasure)",
+"You're a force of nature! A hurricane of correct guesses! (The Wicker Man)",
+"My very cells are vibrating with excitement! (Ghost Rider)",
+"You've created harmony where there was none! (Wild at Heart)",
+"You're making me believe in the power of the human spirit! (The Rock)",
+"This is a moment to savor! (Leaving Las Vegas)",
+"Your memory is a work of art! (Dream Scenario)",
+"You've earned every bit of this success! (The Family Man)",
+"I'm in awe of your abilities! (City of Angels)",
+"You've unlocked the secrets of the cards! (National Treasure)",
+"This is a masterpiece of cognitive function! (The Unbearable Weight of Massive Talent)",
+"You're a legend in the making! (Con Air)",
+"The power of concentration is strong with you! (Matchstick Men)",
+"You're a true memory warrior! (Army of One)",
+"I've seen the future, and it's full of your correct matches! (Next)",
+"Your mind is a formidable weapon! (Mandy)",
+"You've faced the darkness and emerged victorious! (Prisoners of the Ghostland)",
+"The very air crackles with your success! (Color Out of Space)",
+"You've brought joy to my perpetually intense existence! (The Unbearable Weight of Massive Talent)",
+"This is the beginning of a beautiful memory. (Face/Off)",
+"You're the shining example of what a human mind can achieve! (Vampire's Kiss)",
+"I'm not surprised. I always knew you had it in you. (Con Air)",
+"The universe is now a better place because of your memory. (Adaptation.)",
+"You've found the treasure within! (National Treasure)",
+"Truly, a work of art. Your memory is a symphony. (Pig)",
+"The only thing more intense than me is your memory right now. (Mandy)",
+"You've defied expectations and crushed the cards! (The Rock)",
+"This is an opera of perfect matches! (Vampire's Kiss)",
+"You're not just playing, you're performing! (The Unbearable Weight of Massive Talent)",
+];
+
+// Nic Cage Archive Images - **PASTE YOUR IMAGE LINKS HERE**
+const nicolasCageArchiveImages = [
+"https://dl.dropboxusercontent.com/scl/fi/nbukrycrtnu7gs5ed3pam/NicMemory-00001.jpg?rlkey=ri3tx6cmrassn5m6dxiazjs6a&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/xxv4o37ypppwh3w30byhd/NicMemory-00002.jpg?rlkey=80hf7nidr794j51f2efzxh6ut&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/mwrp5qpk296dvbyv6k2af/NicMemory-00003.jpg?rlkey=rbh4x74fm11xb202oykiy818a&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/o5fp0l61i2rt2tztr1zzr/NicMemory-00004.jpg?rlkey=0ffkl9z9675vb6cfoz875e1ul&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/x4ejkuu38wsb8avc3tq4w/NicMemory-00005.jpg?rlkey=h3hpzk2xo0rcmuk31kwhnzq7q&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/73n9chyu4a4okvjuf4zei/NicMemory-00006.jpg?rlkey=o9790wk0us4mj2jix1aok1tbv&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/bc2xxc7l9r5j7dzf2c05v/NicMemory-00007.jpeg?rlkey=tkkqcak2yqo45irjpr459cw6m&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/wqun0jr5bfx8zrs38x9ai/NicMemory-00008.jpeg?rlkey=vuz09fosrlipnavrknclwpil3&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/b1e6m5dkovt3k03sv7w20/NicMemory-00009.jpeg?rlkey=hdfadlz5gvyc5om8wn3wbsa18&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/v8ledwzfxkzqzhrcsorx3/NicMemory-00010.jpg?rlkey=cdutf1fbjehb60y9doff1rnyo&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/y2p3m71roy4rtmpn8i4mj/NicMemory-00011.jpeg?rlkey=na1psx9jfvuqvf1vvchhvihl4&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/0fk71vq23k4n2nllrmgvl/NicMemory-00012.jpeg?rlkey=tiknjrt2nlnlvc2qfgoiszjba&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/1qvhmk0a7ermpse1gswuj/NicMemory-00013.jpeg?rlkey=t85liw8o7lafyy1f0d1sqje7z&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/1nrq7t91a26b4ug4ds0aq/NicMemory-00014.jpeg?rlkey=li920vvedskkw0bn32mi33arr&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/01c36mn00lpn7p6gw6oxx/NicMemory-00015.jpeg?rlkey=zmy0qm28bi4xaaan7hnl5tb0g&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/qh238or0dmyh0snqkqo3u/NicMemory-00016.jpeg?rlkey=tethlz88ouefeib9wtwql2fky&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/dw7p9g3b55293sprzzeq2/NicMemory-00017.jpeg?rlkey=lpd2tm9rsljrat6au794td393&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/55dku51jz1g59ap9ccnf1/NicMemory-00018.jpeg?rlkey=8azhkw6kie4smezbu20k7ryng&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/2hbfbmzv8og4g9sb0mel1/NicMemory-00019.jpeg?rlkey=zcxe7l0wdsisy3vs2ff0hk9tz&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/1jstxj0j35ngc97suoc2c/NicMemory-00020.jpeg?rlkey=6fxh41smwfjgqu4ld5dozl6rg&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/yyryenatjioda0mz81vij/NicMemory-00021.jpeg?rlkey=c05aye0yoe39r1pw64bid5ajo&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/zhurrfj50odnsmncar2wi/NicMemory-00022.jpeg?rlkey=bemsq5iurwhz76rvwrdfa6835&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/7qeivawz8fr8s4qqrpl5t/NicMemory-00023.jpeg?rlkey=7k5652jb2d0jo17tpv2jpo1bm&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/zt80kt727kzyifdw2gjio/NicMemory-00025.jpeg?rlkey=s6brm3d11qawd8k3uqb45k9gk&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/q3bmx4g030s5g1g5ysg8u/NicMemory-00024.jpeg?rlkey=goiy26vnwowpyp1by056wq76c&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/og05k9lcl6vj43snqc7j4/NicMemory-00026.jpeg?rlkey=6zp4zqbuf84z2akvsp8ijtvy0&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/n9wlgye815f7gddostdv2/NicMemory-00027.jpeg?rlkey=ei7o75fhxyxvgnx14h1lg90fc&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/dbi7m2fj88err2u8g3elm/NicMemory-00028.jpeg?rlkey=hygur6cpzg4n3tmskygfdclc2&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/b0jqlot95zco8mmbtb3u5/NicMemory-00029.jpeg?rlkey=xswf0ctao5xw0bijyx0ljlqfi&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/ruf8bwdy189rbimj3a2ef/NicMemory-00030.jpeg?rlkey=5leqve8y9x5x90ma60gwvon7o&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/w6mi4hhniyfmt9tgo1xsf/NicMemory-00031.jpeg?rlkey=kcls79xgkkqddqzv778hbou0w&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/kqp3im5nafa4lynhra9fj/NicMemory-00032.jpeg?rlkey=r0oobgtuh4qq1kno3lck4x8sq&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/sswzvzdl6pltqmcq0y8oi/NicMemory-00033.jpeg?rlkey=5e3slhgyizrcb94qaa1gio78s&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/6k9dgucnoncj78x7amw3w/NicMemory-00034.jpeg?rlkey=5w3ielq9p1vp4gixs4ahrfxlb&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/xoqvo3jkm8t4ikjf805ce/NicMemory-00035.jpeg?rlkey=hm57z0fvr8hwfmroji2go6ske&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/d8vu623io39gbnmr7pwik/NicMemory-00036.jpeg?rlkey=codm3wg1c4aq3mmi08x2mji5n&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/etwma3l9hzf2ujc2lva6d/NicMemory-00037.jpeg?rlkey=w0yvxg7cz6e84n14zv3xhup9u&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/gpv6915ztaxseddmljvu8/NicMemory-00038.jpeg?rlkey=lqn8meae97qzlzqew2vewzvj5&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/8qdhhrgbj6p3nq0l4n85p/NicMemory-00039.jpeg?rlkey=0wf8wtd32z3cjirbn5do1c410&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/9ub6wer96aqqnb6zf6ggp/NicMemory-00040.jpeg?rlkey=b5cldtbcd8wcgwyfrm3vlfriq&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/dcm8wrq8bz4j01mu78nh5/NicMemory-00041.jpeg?rlkey=wkaqqemrlo0kipsw8abafzdxh&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/clrdt5bfs5tjd123eqona/NicMemory-00042.jpeg?rlkey=wzc72yr1bmle5xix1x2x5mx9w&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/ipogl429rforiju9da5yj/NicMemory-00043.jpeg?rlkey=aklj56lqnt2nvwtxb09zffuaf&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/en125kcfzmjk62assidgn/NicMemory-00044.jpeg?rlkey=c0gjilvpgupx6qwdvcebkeds2&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/l1h4uhj89l6ekfky5u1ct/NicMemory-00045.jpeg?rlkey=kymixncimz77y40krd84pw6un&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/443pybdvyxcf8qhrc5yqa/NicMemory-00046.jpeg?rlkey=qlbvvmcqrwka21dt2csyhtwbb&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/wotho4ur1b5lezre6z451/NicMemory-00047.jpeg?rlkey=aveiuico8c0609za9pwy5i5sf&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/lawz34rd5omsh97ysed5l/NicMemory-00048.jpeg?rlkey=cqs12zg9tbsv0r4j5lctb8n2b&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/ilzlb92bounvruamn6tic/NicMemory-00049.jpeg?rlkey=erz4in11wh8cvgxov2oyxa78w&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/63dfpgu7sj67mhm7brjyl/NicMemory-00050.jpeg?rlkey=hrxl97gq0ehr80uh6xnn0oajd&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/pv4xrp0vu3dz3l80zp7g9/NicMemory-00051.jpeg?rlkey=nw4p3ofm2b1na53wo4t8dfwpz&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/smwstkbos6zhui77rvivm/NicMemory-00052.jpeg?rlkey=a4gxmvl7s4yograhrjjq7783p&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/1tptklx95he011r5x74wy/NicMemory-00053.jpeg?rlkey=stagf04u31o3y56an2ad9e6zh&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/8oeczmbk8x7ob0j0rprgb/NicMemory-00054.jpeg?rlkey=o2dfxbfws3c32rk7zhh2ttay3&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/ynr88iblop2aw8r8tlwvc/NicMemory-00055.jpeg?rlkey=djbmwbqobir4gobo9kwsthn2u&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/j3l28600273psmmlw67lg/NicMemory-00056.jpeg?rlkey=1zpd7e3ghxt5cze9wqn6ysg0p&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/lfmul0nb2fnbmyczfz12q/NicMemory-00057.jpeg?rlkey=wcm83exx04mo6p5blrmxn04s0&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/5bf3utqpkfy2j7a37qolr/NicMemory-00058.jpeg?rlkey=0kopur7yazoa2rmlzd2xbv9zp&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/9gjoepcljfo1j8qu0hk20/NicMemory-00059.jpeg?rlkey=yixrlp8xb2b2mb595cmsiry2x&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/om6b616z4ae0z3jusy8tn/NicMemory-00060.jpeg?rlkey=w1u1xv7446z0l1n9855mi69mn&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/spz0sb4wdp3io5sdhwxbi/NicMemory-00061.jpeg?rlkey=rku1rift268enpf545lgwznbp&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/jwj7p8p67myrubmu67vo2/NicMemory-00062.jpeg?rlkey=c2xwk7itdvo7g67zwsij9cd62&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/grhf72nyz1z3i5kwu9pp0/NicMemory-00063.jpeg?rlkey=33u97mccq3w0rpcrjn5fcy29p&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/qeppblxz569elh6fzbijw/NicMemory-00064.jpeg?rlkey=052hvgr2dcprhowoxp3alzmc1&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/eyyy2e3on1prrvh56vi4h/NicMemory-00065.jpeg?rlkey=4ceby0jpbmn8d93rx2aaapoml&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/hpb8ae2w0s0qqf79aqhkf/NicMemory-00066.jpeg?rlkey=uxicyjzutwbsepw51sj46bjzl&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/mo7olbizlqsqc14rh2nqw/NicMemory-00067.jpeg?rlkey=jlc1q1s9i9jrvwc18srza4h7b&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/g3p3kavdk1lipb3335lgj/NicMemory-00068.jpeg?rlkey=ep1wcjeo9p0bcihrxxhat77um&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/d4akaw842l2lkiiouszkk/NicMemory-00069.jpeg?rlkey=jeasfv8vje0jm6dcapr79aytu&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/6ew9qzi2p5a67hvrcz6io/NicMemory-00070.jpeg?rlkey=wmseapt5vyou42o936khlqisc&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/f99qywco028nb8kmknaed/NicMemory-00071.jpeg?rlkey=q3qna3irr2g6yitub5xcf9r78&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/8joe2iqak0xs13wzdxz90/NicMemory-00072.jpeg?rlkey=uv8sfkrd9fohv93u9y4v6c8gb&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/6i6cw2f3ob9qyenn8vx3f/NicMemory-00073.jpeg?rlkey=0orfmypcgkwp43sr3ho9dtazx&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/x19kfze95hih2wjepbqsl/NicMemory-00074.jpeg?rlkey=k2zadtajq4rd7h6bw2a3skbhf&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/t00kc8p945sq6igrsso16/NicMemory-00075.jpeg?rlkey=ub1d5zg3ofkrxv2cf2w8mr31p&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/lqxmd3ulx1yimlqoszvpx/NicMemory-00076.jpeg?rlkey=mucwn0ud4cyv29jzydqxjlyb6&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/8bemkm8gfe5eczuecxkun/NicMemory-00077.jpeg?rlkey=rcb98tqdcrow53zgvhrpiermj&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/19bsrhkd7soh0hmwpyxpa/NicMemory-00078.jpeg?rlkey=6r6fg6xl1tg4426npx1bnzjwv&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/1tm26ovgk6sd2oswjwmwr/NicMemory-00079.jpeg?rlkey=qingr6m7xslsu6n02bz3q5wcq&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/e18pnekv87lh4smagpj84/NicMemory-00080.jpeg?rlkey=uiypznnxyyndal4jscp9sgric&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/8nxsx1wrls4r56zzdjejw/NicMemory-00081.jpeg?rlkey=as4rr4hb3dnqqjnbqxh6da55o&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/uuf0zsfl07tf5x46u1tw9/NicMemory-00082.jpeg?rlkey=dhhtfki9mzufy1l1w8e2c7teu&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/km29zr2f51zi24ye4ijyy/NicMemory-00083.jpeg?rlkey=5dfcykjsqxa5peopu6c0upvf9&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/85wrhvuzekkwf500aovvc/NicMemory-00084.jpeg?rlkey=fcv8t9d4x5gqu5a1szzrje2xa&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/f8yjg4mk2vcl7ya9akhrz/NicMemory-00085.jpeg?rlkey=roivv7g9cc7mbev3v0n9j94br&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/u1wekpjuygs1xda4mlbf1/NicMemory-00086.jpeg?rlkey=j9xqhjiyzs8flg2c2w9e1sjj9&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/1w0wkeoe0g7vbxt755m2g/NicMemory-00087.jpeg?rlkey=p3m6qxeci347dj1wbdzmr4psw&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/7unfuq64mkkcufxn8oa4h/NicMemory-00088.jpeg?rlkey=0znoipyquyel0pb559pbox2d7&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/kd4uw4u4vgs3zhancydy8/NicMemory-00089.jpeg?rlkey=6rv44umzz2hh9y4a3kxhud3ta&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/57h6gqhfotuf6gpsakpiq/NicMemory-00090.jpeg?rlkey=niw9jnw3dwl3kkw4bc1w7zhyo&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/tvaxudbbqchbbhybzakn5/NicMemory-00091.jpeg?rlkey=1ldjvg8m5h75eiu7dng0fk7wq&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/er1b1pvbul4wohpx3jr12/NicMemory-00092.jpeg?rlkey=lu5kd3a2wpyedgypqbhw7zsgt&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/s2yx756dva5j20oszca93/NicMemory-00093.jpeg?rlkey=aancd7a8csmjpwv74w7yru7ck&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/pinpvh27hjaklecrdui5m/NicMemory-00094.jpeg?rlkey=a8qe5jcsk0o3ictiewpb906bp&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/2g4fl4b7nnwa81yxcy5dx/NicMemory-00095.jpeg?rlkey=jzckgdb51gzyaap04vf8ikkqe&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/joy21t5kjsf95v2qbrhtc/NicMemory-00096.jpeg?rlkey=iab1fw1tn5ljgof0bt7lxbs6r&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/gbmf12bn6r4vnbvu4cspo/NicMemory-00097.jpeg?rlkey=gvdhdgm5cjfblgb0vmv6q9r5f&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/88ssintwrhgl3011huvog/NicMemory-00098.jpeg?rlkey=ajcylj2hdy1owvm8d0xafqp2j&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/fbsfuodwefj1ay9bpshbd/NicMemory-00099.jpeg?rlkey=pnrrf5mn4kblle5kp6ceinhjl&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/pt9bmh3h1t7kpales5dvp/NicMemory-00100.jpeg?rlkey=r3j0ejlr69gd58es1uw8a2gnn&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/jllslijzvbfoeuf11all2/NicMemory-00101.jpeg?rlkey=io2j0fyru5ebrjb5g1hk5jnhu&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/qbhx68m1uxp6tl43tqd21/NicMemory-00102.jpeg?rlkey=3hjq0j274uchgt1gdgn56eo7t&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/clb97p0hdu3qy9jtypf23/NicMemory-00103.jpeg?rlkey=cy2lhjpnei2b1xsshiskej844&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/96yni455pim0vm9flgov3/NicMemory-00104.jpeg?rlkey=4ftxz7nxgqqoqesiyqb7nhbqp&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/cx443hhop308m6f9o1tqf/NicMemory-00105.jpeg?rlkey=0f2zlzmcfi9aekbgqpt2hny74&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/g4t0imzcvz0n1roqb6sns/NicMemory-00106.jpeg?rlkey=6uzr58ma9qlc3q8oy1ncybmq3&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/kzxpq8jgm7wqq7rmob7a0/NicMemory-00107.jpeg?rlkey=1iw1zykejko4di10b6qaq4pdz&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/jbgl8l30xq07pz1o811tx/NicMemory-00108.jpeg?rlkey=388g0no393njqdmpyiymgpq9d&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/zvh50g7piqqagpqenpyo1/NicMemory-00109.jpeg?rlkey=0vt2z6uv4a8azek65jd9zx2ok&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/z0rihvzq7qt5nqnktds2w/NicMemory-00110.jpeg?rlkey=n18bhyl45yl3i54ms60ig3vae&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/d683ur5f5v5ydxd5e1sxf/NicMemory-00111.jpeg?rlkey=k9c7mfhf49vbwrub70oucp1ri&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/iigqhkfhg3j2bt5btk4z3/NicMemory-00112.jpeg?rlkey=2r58u7l8uc64cuo39eyjae8f7&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/5bllqcsqoal0laaw57q5q/NicMemory-00113.jpeg?rlkey=wvdynkzbquaxcqx1oi3tqspdb&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/njo87r5satic1euwumnwk/NicMemory-00114.jpeg?rlkey=k9pcek6onnn7dv5aggxbd7qtd&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/ijw1jmt8nvh8ozc8pd1jj/NicMemory-00115.jpeg?rlkey=naze1jioru6bv5yo9e2lggm8w&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/po8kojzaohinzhgtrq9v4/NicMemory-00116.jpeg?rlkey=zkwbzjvf8dqpdh0rprjuypduj&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/dv4mrb91qf4v3q579ftk3/NicMemory-00117.jpeg?rlkey=fqynxjkacr7m5ffqyab5p4vk3&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/monr0qvgld4dv7rjbnxde/NicMemory-00118.jpeg?rlkey=0hbv12pgm3i6n0hdb497t1n24&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/pu5l43e2i24kj077rnirh/NicMemory-00119.jpeg?rlkey=sh042tulbdzjxdfrz6c6hrzgz&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/iiu73tgic632hjrb76tjr/NicMemory-00120.jpeg?rlkey=lhwh1h3v2as5szxe96svq0ozq&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/cag2gols4w83iwzg7cern/NicMemory-00121.jpeg?rlkey=pwu3qv7jenhua85c1eruw8wjk&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/7tappstcd9g7xe9sa931x/NicMemory-00122.jpeg?rlkey=yafltsd9drcwbt40095wl7uxc&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/v3y2j3qmvmd9q0a7cdthb/NicMemory-00123.jpeg?rlkey=1sig3q3ziz8wv4gvndwrf4wi1&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/12ygrj24usfmqbw6cyfp1/NicMemory-00124.jpeg?rlkey=5g0qkz2qb8fdzmcqompohvvza&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/wwi3rk1lyrk6orbfhij3r/NicMemory-00125.jpeg?rlkey=38r8mm21wqxqtramzj1efbpuh&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/4ky9teffm1tymrbfig0ui/NicMemory-00126.jpeg?rlkey=dwy16o37bd0l3xuu2ahgb5jgn&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/jfcse7bacojiyyov3xwqj/NicMemory-00127.jpeg?rlkey=v8rkop6lewntwoxl8fvi2mkb4&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/4odeusqk6rh7k5pbhmuq0/NicMemory-00128.jpeg?rlkey=g72r85dnf1w1xri9f6v0rmdlr&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/qk2pg1y1zecsus8zb7g7w/NicMemory-00129.jpeg?rlkey=bxu805q69hxna5g5ccf6heo5z&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/3lnp93cbf1a68irjzmgmb/NicMemory-00130.jpeg?rlkey=oyv4yzgx995ofhkbq3vook7gn&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/6i6498e61hh3tkog51aoj/NicMemory-00131.jpeg?rlkey=3oa8e7cdhyxohcs2n5pl33epw&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/co3llpxbgjhmd3bngjwyc/NicMemory-00132.jpeg?rlkey=3lf1dtp9cl8c34otqp2x2m6jn&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/7eme43iicyc6e8gjvmh2u/NicMemory-00133.jpeg?rlkey=1g5lg7lmox7xjdyutvkmdvcsq&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/wx2umh08guriypz8mv8zo/NicMemory-00134.jpeg?rlkey=luf03r39rgl3g8l9n0xw576at&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/dgdocjyht4vwz7st2yves/NicMemory-00135.jpeg?rlkey=v5zkakb9pb53gg2pe5on59quu&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/u6ox5laqdf41quz2sh0rf/NicMemory-00136.jpeg?rlkey=53e5bd0mesqtzhpcvs74kta10&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/g6ej8a3e4r66r24ka9pa2/NicMemory-00137.jpeg?rlkey=o2de8m7nkcvg2ctuovrxn42hr&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/cm6e3te2i2cbe8wts99lh/NicMemory-00138.jpeg?rlkey=7es87w1msd5pw1s20yyk3uerr&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/ldy70t2k2kt632o2vlfr8/NicMemory-00139.jpeg?rlkey=cp8hy8lxyzgqbcg4uu1xhy24h&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/dty4vx9rda6kiw2dn92fm/NicMemory-00140.jpeg?rlkey=vsug9tc29jnfbabih2k7rhhxh&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/ix2fur0im41ehjvxazp5i/NicMemory-00141.jpeg?rlkey=btm5i1keztg2282f3jjtm289v&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/42mmimx7fjgja3619obcn/NicMemory-00142.jpeg?rlkey=nvnuda2rtenp5gqgzhrbx33td&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/giszof36d95dwrr5ox7gz/NicMemory-00143.jpeg?rlkey=wf3gor7jhkzoy8rncmylb8mkv&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/co5yxt0v7g7wso13csx69/NicMemory-00144.jpeg?rlkey=z45rsil7jxy0qvh0yavibsprn&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/1vydpckcrft5sstlcxcot/NicMemory-00145.jpeg?rlkey=le45bi6lbovo2w1k1tj6tk8ig&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/eq8nwrij3gbz5pw2itlz7/NicMemory-00146.jpeg?rlkey=zvpn9cun6x4s2yq52ctmr46vl&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/ubidktky6hxalgdfvy0z5/NicMemory-00147.jpeg?rlkey=zrg2ll44i2zh1hsi9mj5dyppw&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/1dhssdz2l8ldlzk2ljwl1/NicMemory-00148.jpeg?rlkey=5th1ld0m5ees15hydwrtvujf2&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/g39hcqwvpkywux7fug62l/NicMemory-00149.jpeg?rlkey=geeod28y7eck98jvitmx9rzhk&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/rhxoc8hj5qrjew7g7x8p3/NicMemory-00150.jpeg?rlkey=iud8lawhd5fm2i8mylldtrt56&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/ckx2vzyzw6zjiy9enn9ao/NicMemory-00151.jpeg?rlkey=ukzqwa9lvykur8ookxrlb48zq&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/yekvlozxwfsa5yhu38u8u/NicMemory-00152.jpeg?rlkey=ia3qr8ozkg0p0ibbqq8ztz7jh&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/iz9elvh2zm6dqwpokxvp3/NicMemory-00153.jpeg?rlkey=5h2284s2dn7pdeanru5orwrw3&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/95nk259elgo6sqgo16hjr/NicMemory-00154.jpeg?rlkey=du0mpp80vkdvhmcc8lcqoebvi&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/h8htc6uk5sh2lbyszya47/NicMemory-00155.jpeg?rlkey=v5bc92w3awbmulv2qcqw6eucu&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/900g7olk69r1u7j51lqeh/NicMemory-00156.jpeg?rlkey=jfqas2mub1278p4reu498im96&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/bzqzidtbuwjc035m64r8t/NicMemory-00157.jpeg?rlkey=nk9o445wz3fmyn1wzfnm53vh9&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/8noxc17w6uspud5iwzach/NicMemory-00158.jpeg?rlkey=3q9wccwroqgpqibsmu12pu5nh&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/emmpmx0thy30hphuo4kzt/NicMemory-00159.jpeg?rlkey=u1nq31a4itvk75bu2p8f56gml&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/z7an3wy76otpcgjdko7q9/NicMemory-00160.jpeg?rlkey=jytldt5kmh96joizg5646br2k&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/1zx143xud1rnqpix0msjq/NicMemory-00161.jpeg?rlkey=h5r2uc13ae6075l9qipu93fvx&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/t9bpzwcl9ixrod6m2bf1w/NicMemory-00162.jpeg?rlkey=xfedwclf1b13p5mngo23v51gp&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/81hlv7xwkad441un48ypu/NicMemory-00163.jpeg?rlkey=ayeqo4xylwubmx7n4jus3i7yw&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/vqofeijk1bornmnl06369/NicMemory-00164.jpeg?rlkey=34yf5w5aao80plu43a0lka5es&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/ecgmsorw45n65e9fm5rgj/NicMemory-00165.jpeg?rlkey=59zzhtqz7z3czhj87v8h6t6q1&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/y5nupowheddg1oq0bqtue/NicMemory-00166.jpeg?rlkey=144jjy7wnxfmxmounnixof327&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/4h0h46uj8lh2dj1pds336/NicMemory-00167.jpeg?rlkey=xgsmzjdhpfdl1tmokzw8fwt5m&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/1pq70dcze0jc3u7ni1pfa/NicMemory-00168.jpeg?rlkey=jst0nitqw7kn3zx1r6h5za6r7&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/dnfupb4crspd5a3b6kt7m/NicMemory-00169.jpeg?rlkey=zw3e0t09108cgx9zocq593mty&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/i8mbcnn9mgupyt1fqgsgt/NicMemory-00170.jpeg?rlkey=le1p69ya4mxlr6pddlebvpktw&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/p0em0p6vss63xicnezsxv/NicMemory-00171.jpeg?rlkey=zzbo3idrqwbf1j8oxux8d95uj&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/4o2k7t51e988xje1ps8s4/NicMemory-00172.jpeg?rlkey=b9u5x0h7334vx7k24bnz21otd&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/62nbwrkmru5v7eby2g53s/NicMemory-00173.jpeg?rlkey=4m88mm5yf0h87p473sk0yzf39&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/u5sffj8n7p3i6k66zzlmp/NicMemory-00174.jpeg?rlkey=g19dl7nwd3fbgerjyv7w5sn4j&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/wqcdw4qspkmsgwnea2mjt/NicMemory-00175.jpeg?rlkey=o1jkcn60t7k6xektiuq7ks6cy&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/qau13wotw094o49r6uw4f/NicMemory-00176.jpeg?rlkey=xxi25i1g2qabzztrxaf4k3xna&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/vhv4kibnucmn5xnfsshf2/NicMemory-00177.jpeg?rlkey=essigj1fbs8pf226j9zfgle9d&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/dfawck4yghy712htp8yrr/NicMemory-00178.jpeg?rlkey=k5dbuv0byejj4yyjqxendgkud&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/rrwggu31u9xmb62ew252x/NicMemory-00179.jpeg?rlkey=voa3ofuf554kro7yotq25qy8b&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/4fa3ftzsc2p1yg4801mmv/NicMemory-00180.jpeg?rlkey=3y39vlzfc699o0vp5xovmja79&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/kn2mw3e5jxdq4t2lm13wl/NicMemory-00181.jpeg?rlkey=d4bjugv70sxovzx6dppnnnemy&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/z2bpbnikdmqhxephsworw/NicMemory-00182.jpeg?rlkey=7pm48rl05qxlyb7mlt3x8w8k7&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/37ce2rakt8rix7gax1xhr/NicMemory-00183.jpeg?rlkey=ibikrrc9h4fjov27txal8fgtj&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/gpb41tbr2og9c65vg0bmw/NicMemory-00184.jpeg?rlkey=2or85bv4idu9fxeqxk8667fgb&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/kqyomz1w57r8e2a6s6fu6/NicMemory-00185.jpeg?rlkey=6c1whsrd7owstejs3iv9kopct&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/uhjszp0s1wth79gbcjw63/NicMemory-00186.jpeg?rlkey=ex4lmt248zd941iwr8qmja9vc&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/b5j2jl4ll21fuiu7xlqfx/NicMemory-00187.jpg?rlkey=n82wdk6ftpgo0ooryzvxaoo4j&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/iwu3rhipz8of3t621zgmv/NicMemory-00188.jpg?rlkey=fmm2mak466dfe1gmnytttoiif&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/1l5yo86zf55zvssvhb4j5/NicMemory-00189.jpg?rlkey=fv1ajgi20112dbiyj3c437t4c&dl=1",
+"https://dl.dropboxusercontent.com/scl/fi/wkuzvaqx8a1pzb85s8aj2/NicMemory-00190.png?rlkey=5dwhy3kux4d67fb4amoqa8phe&dl=1"
+];
+
+
+// --- Image Upload Logic ---
+fileInput.addEventListener('change', (event) => {
+uploadedImageURLs = [];
+imagePreviewContainer.innerHTML = '';
+const files = event.target.files;
+
+if (files.length === 0) {
+uploadMessage.textContent = 'No files selected.';
+startGameButton.disabled = true;
+return;
+}
+
+// Updated requirement to 25 unique images, no displayed upper limit.
+// The HTML p tag already reflects "25 unique images" and "100 levels"
+if (files.length < 25) {
+uploadMessage.textContent = `Need at least 25 unique images to play all 100 levels! You have ${files.length}.`;
+startGameButton.disabled = true;
+return;
+} else {
+uploadMessage.textContent = `Ready! You have ${files.length} images.`;
+startGameButton.disabled = false;
+}
+
+// Limit the number of images processed to a reasonable amount, e.g., 200, to prevent performance issues
+// The prompt says "200+ images at the start of game if need be (no need to display this limit though)"
+const maxImagesToProcess = 200;
+Array.from(files).slice(0, maxImagesToProcess).forEach(file => {
+if (file.type.startsWith('image/')) {
+const reader = new FileReader();
+reader.onload = (e) => {
+uploadedImageURLs.push(e.target.result);
+const img = document.createElement('img');
+img.src = e.target.result;
+img.classList.add('preview-image');
+imagePreviewContainer.appendChild(img);
+};
+reader.readAsDataURL(file);
+}
+});
+});
+
+startGameButton.addEventListener('click', () => {
+// Updated alert message for 100 levels
+if (uploadedImageURLs.length < 25) {
+alert("Please upload at least 25 unique images before starting the game to experience all 100 levels!");
+return;
+}
+showLoadingScreen(() => {
+    imageUploadSection.classList.add('hidden');
+    gameSection.classList.remove('hidden');
+    restartGameButtonTop.style.display = 'block'; // Show restart button
+    level = 1;
+    currentLevelSpan.textContent = level;
+    availableWrongGuesses = 25; // Initial chances for Level 1 when starting a new game
+    currentWrongGuesses = 0; // Reset for new game
+    wrongGuessCountForSpice = 0; // Reset for new game
+    initialPreviewTime = 3000; // Reset initial preview time
+    updateLivesDisplay();
+    wrongGuessMessageElem.classList.add('hidden'); // Hide message at start
+    levelMessageElem.textContent = ""; // Clear level completion message
+    spiceButton.classList.add('hidden'); // Hide spice button at start
+    startLevelTimer(); // Start timer for the new level
+    createBoard();
+});
+});
+
+// Nic Cage Archive Button Logic
+archiveButton.addEventListener('click', () => {
+if (nicolasCageArchiveImages.length < 25) {
+alert("Not enough images in the Nic Cage Archive for a full game. Please add more!");
+return;
+}
+uploadedImageURLs = nicolasCageArchiveImages; // Use archive images
+showLoadingScreen(() => {
+    imageUploadSection.classList.add('hidden');
+    gameSection.classList.remove('hidden');
+    restartGameButtonTop.style.display = 'block'; // Show restart button
+    level = 1;
+    currentLevelSpan.textContent = level;
+    availableWrongGuesses = 25;
+    currentWrongGuesses = 0;
+    wrongGuessCountForSpice = 0;
+    initialPreviewTime = 3000;
+    updateLivesDisplay();
+    wrongGuessMessageElem.classList.add('hidden');
+    levelMessageElem.textContent = "";
+    spiceButton.classList.add('hidden');
+    startLevelTimer();
+    createBoard();
+});
+});
+
+// --- Game Logic ---
+function shuffleArray(array) {
+for (let i = array.length - 1; i > 0; i--) {
+const j = Math.floor(Math.random() * (i + 1));
+[array[i], array[j]] = [array[j], array[i]];
+}
+return array;
+}
+
+function updateLivesDisplay() {
+livesInfoSpan.textContent = availableWrongGuesses - currentWrongGuesses;
+}
+
+let remainingTime = LEVEL_TIME_LIMIT;
+
+function startLevelTimer() {
+clearInterval(timerInterval); // Clear any existing timer
+remainingTime = LEVEL_TIME_LIMIT; // Reset time for the new level
+updateTimerDisplay();
+
+timerInterval = setInterval(() => {
+remainingTime--;
+updateTimerDisplay();
+
+if (remainingTime <= 0) {
+clearInterval(timerInterval);
+gameOver("Time's up! Nicolas Cage sighs dramatically. Restarting the game.");
+}
+}, 1000);
+}
+
+function updateTimerDisplay() {
+const minutes = Math.floor(remainingTime / 60);
+const seconds = remainingTime % 60;
+timerDisplay.textContent = `Time: ${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+}
+
+
+function createBoard() {
+gameBoard.innerHTML = '';
+flippedCards = [];
+matchedPairs = 0;
+lockBoard = true; // Lock board during preview
+currentWrongGuesses = 0; // Reset wrong guesses for the new level (but not availableWrongGuesses)
+wrongGuessCountForSpice = 0; // Reset spice counter for new level
+spiceButton.disabled = true; // Disable spice button at start of level
+
+// No longer setting availableWrongGuesses to 25 here for every level
+updateLivesDisplay(); // Update lives display for new level
+
+if (level >= 11) { // Show Spice button after level 10
+spiceButton.classList.remove('hidden');
+} else {
+spiceButton.classList.add('hidden');
+}
+
+winMessageElem.classList.add('hidden');
+resetButton.style.display = 'none';
+wrongGuessMessageElem.classList.add('hidden'); // Hide message at start of level
+
+const { pairs, columns, bgColor } = levelSettings[level];
+totalPairsPerLevel = pairs;
+
+// Update body background color for the new level
+body.style.background = `linear-gradient(135deg, ${bgColor}, ${darkenColor(bgColor, 20)}, ${lightenColor(bgColor, 20)})`;
+
+// Ensure enough unique images for the current level
+if (uploadedImageURLs.length < totalPairsPerLevel) {
+console.error(`Error: Not enough unique images uploaded for level ${level}. You need at least ${totalPairsPerLevel} unique images.`);
+levelMessageElem.textContent = "Error: Not enough images for this level! Please upload more and restart.";
+lockBoard = true; // Keep board locked if there aren't enough images
+clearInterval(timerInterval); // Stop the timer
+return;
+}
+
+const selectedImages = shuffleArray([...uploadedImageURLs]).slice(0, totalPairsPerLevel);
+cards = [...selectedImages, ...selectedImages];
+shuffleArray(cards);
+
+// Adjust columns based on mobile mode setting
+let currentColumns = columns;
+if (body.classList.contains('mobile-mode-active') || window.innerWidth <= 768) {
+if (totalPairsPerLevel <= 6) currentColumns = 2; // 2x3 or 3x2
+else if (totalPairsPerLevel <= 12) currentColumns = 3; // 4x3 or 3x4
+else currentColumns = Math.ceil(Math.sqrt(totalPairsPerLevel * 2 / 1.5)); // Dynamic square-ish layout
+if (currentColumns > 6) currentColumns = 6; // Cap for very large boards on mobile
+}
+gameBoard.style.gridTemplateColumns = `repeat(${currentColumns}, 1fr)`;
+
+
+cards.forEach((imageURL, index) => {
+const cardElement = document.createElement('div');
+cardElement.classList.add('card');
+cardElement.dataset.name = imageURL;
+
+cardElement.innerHTML = `
+<div class="card-inner">
+<div class="card-front"></div>
+<div class="card-back">
+<img src="${imageURL}" alt="memory card image">
+</div>
+</div>
+<div class="match-effect-container"></div> `;
+
+cardElement.addEventListener('click', flipCard);
+gameBoard.appendChild(cardElement);
+
+// Apply difficulty changes after level 5
+if (level > 5) {
+const cardBackImage = cardElement.querySelector('.card-back img');
+// Random rotation between -10 and 10 degrees
+const rotationAmount = (Math.random() * 20 - 10);
+// Random blur between 0.5px and 2px
+const blurAmount = (Math.random() * 1.5) + 0.5;
+// Apply the transforms and filters
+cardBackImage.style.transform = `rotate(${rotationAmount}deg)`;
+cardBackImage.style.filter = `blur(${blurAmount}px)`;
+}
+});
+
+// Preview phase: Show cards for `initialPreviewTime` seconds
+previewCards(initialPreviewTime);
+}
+
+function previewCards(duration) {
+const allCards = document.querySelectorAll('.card');
+allCards.forEach(card => {
+card.classList.add('flipped');
+});
+
+levelMessageElem.textContent = `Get ready! Level ${level} preview for ${duration / 1000} seconds...`;
+setTimeout(() => {
+allCards.forEach(card => {
+card.classList.remove('flipped');
+});
+lockBoard = false; // Unlock board after preview
+levelMessageElem.textContent = ""; // Clear preview message
+startLevelTimer(); // Start timer AFTER preview
+}, duration);
+}
+
+function flipCard() {
+if (lockBoard) return;
+if (this.classList.contains('flipped')) return;
+if (this === flippedCards[0]) return;
+
+this.classList.add('flipped');
+flippedCards.push(this);
+playRandomSound(flipSounds, 'sfx');
+
+if (flippedCards.length === 2) {
+lockBoard = true;
+checkForMatch();
+}
+}
+
+function checkForMatch() {
+const [card1, card2] = flippedCards;
+const isMatch = card1.dataset.name === card2.dataset.name;
+
+if (isMatch) {
+playRandomSound(matchSounds, 'sfx');
+disableCards();
+wrongGuessMessageElem.classList.add('hidden'); // Hide wrong guess message on match
+availableWrongGuesses++; // Add one chance for each correct match
+updateLivesDisplay(); // Update lives display immediately
+createElectricityZapEffect(card1); // Call for card1
+createElectricityZapEffect(card2); // Call for card2
+} else {
+playRandomSound(noMatchSounds, 'sfx');
+currentWrongGuesses++;
+wrongGuessCountForSpice++; // Increment spice button counter
+updateLivesDisplay(); // Update lives display immediately
+
+if (level >= 11 && wrongGuessCountForSpice % 3 === 0) {
+spiceButton.disabled = false;
+}
+
+const flipBackDelay = (level >= 1 && level <= 10) ? 1500 : 1000;
+
+setTimeout(() => {
+displayWrongGuessMessage();
+}, 500);
+
+unflipCards(flipBackDelay);
+
+if ((availableWrongGuesses - currentWrongGuesses) <= 0) { // Check if remaining chances are 0 or less
+clearInterval(timerInterval); // Stop the timer before game over
+setTimeout(() => {
+gameOver("Game Over! Too many wrong tries. Nicolas Cage is not impressed. Restarting the game.");
+}, 1500);
+}
+}
+}
+
+function createElectricityZapEffect(cardElement) {
+const container = cardElement.querySelector('.match-effect-container');
+container.innerHTML = ''; // Clear previous effects
+
+// Create electricity sparks (multiple small particles)
+for (let i = 0; i < 15; i++) { // More sparks
+const spark = document.createElement('div');
+spark.classList.add('electricity-particle');
+// Position randomly around the edge
+const edge = Math.floor(Math.random() * 4); // 0: top, 1: right, 2: bottom, 3: left
+let x, y;
+switch (edge) {
+case 0: x = Math.random() * 100; y = 0; break; // Top
+case 1: x = 100; y = Math.random() * 100; break; // Right
+case 2: x = Math.random() * 100; y = 100; break; // Bottom
+case 3: x = 0; y = Math.random() * 100; break; // Left
+}
+spark.style.left = `${x}%`;
+spark.style.top = `${y}%`;
+spark.style.animationDelay = `${Math.random() * 0.3}s`; // Stagger sparks
+container.appendChild(spark);
+}
+
+// Create electricity paths around the edges
+const pathTop = document.createElement('div');
+pathTop.classList.add('electricity-path', 'path-top');
+container.appendChild(pathTop);
+
+const pathRight = document.createElement('div');
+pathRight.classList.add('electricity-path', 'path-right');
+container.appendChild(pathRight);
+
+const pathBottom = document.createElement('div');
+pathBottom.classList.add('electricity-path', 'path-bottom');
+container.appendChild(pathBottom);
+
+const pathLeft = document.createElement('div');
+pathLeft.classList.add('electricity-path', 'path-left');
+container.appendChild(pathLeft);
+
+// Create central explosion
+const explosion = document.createElement('div');
+explosion.classList.add('explosion-effect');
+container.appendChild(explosion);
+
+// Remove all effects after animation completes
+setTimeout(() => {
+container.innerHTML = '';
+}, 1000); // Total animation duration is around 0.6s + 0.5s delay + 0.4s = 1.5s, remove slightly earlier for smooth transition
+}
+
+
+function displayWrongGuessMessage() {
+const randomIndex = Math.floor(Math.random() * nicolasCageWrongGuessQuotes.length);
+wrongGuessMessageElem.textContent = nicolasCageWrongGuessQuotes[randomIndex];
+wrongGuessMessageElem.classList.remove('hidden');
+wrongGuessMessageElem.classList.add('visible');
+wrongGuessMessageElem.style.animation = 'shake 0.5s ease-in-out';
+setTimeout(() => {
+wrongGuessMessageElem.classList.remove('visible');
+wrongGuessMessageElem.style.animation = 'none';
+}, 3000);
+}
+
+function disableCards() {
+flippedCards[0].removeEventListener('click', flipCard);
+flippedCards[1].removeEventListener('click', flipCard);
+flippedCards[0].classList.add('matched');
+flippedCards[1].classList.add('matched');
+
+matchedPairs++;
+resetBoard();
+
+if (matchedPairs === totalPairsPerLevel) {
+clearInterval(timerInterval); // Stop the timer when level is complete
+setTimeout(() => {
+levelComplete();
+}, 800);
+}
+}
+
+function unflipCards(delay) {
+setTimeout(() => {
+flippedCards[0].classList.remove('flipped');
+flippedCards[1].classList.remove('flipped');
+resetBoard();
+}, delay);
+}
+
+function resetBoard() {
+[flippedCards, lockBoard] = [[], false];
+}
+
+function levelComplete() {
+const bonusChances = 1;
+availableWrongGuesses += bonusChances; // Lives carry over and accumulate
+
+updateLivesDisplay();
+
+if (level < Object.keys(levelSettings).length) {
+playRandomSound(levelUpSounds, 'sfx');
+
+const randomIndex = Math.floor(Math.random() * nicolasCageLevelCompleteQuotes.length);
+levelTransitionMessageElem.innerHTML = `
+Level Complete!
+<span class="quote">"${nicolasCageLevelCompleteQuotes[randomIndex]}"</span>
+<img src="${customLoadingGifLink}" alt="Transition GIF" class="transition-gif"> <span class="chances-bonus">+${bonusChances} Chances!</span>
+<span class="total-chances">Total Chances: ${availableWrongGuesses - currentWrongGuesses}</span>
+`;
+levelTransitionMessageElem.classList.remove('hidden');
+levelTransitionMessageElem.classList.add('visible');
+gameSection.classList.add('hidden');
+
+setTimeout(() => {
+level++;
+currentLevelSpan.textContent = level;
+levelTransitionMessageElem.classList.remove('visible');
+levelTransitionMessageElem.classList.add('hidden');
+gameSection.classList.remove('hidden');
+createBoard();
+}, 4000);
+} else {
+gameBoard.innerHTML = '';
+levelMessageElem.textContent = "You actually finished? Wow. Now go tell your therapist. You've earned it.";
+winMessageElem.classList.remove('hidden');
+playRandomSound(winSounds, 'sfx');
+resetButton.style.display = 'block';
+restartGameButtonTop.style.display = 'none'; // Hide top restart button on win screen
+}
+}
+
+function gameOver(message) {
+playRandomSound(gameOverSounds, 'sfx');
+alert(message);
+resetGame(true); // Pass true to retain images
+}
+
+function resetGame(retainImages = false) {
+clearInterval(timerInterval); // Stop timer on reset
+level = 1;
+currentLevelSpan.textContent = level;
+levelMessageElem.textContent = "";
+wrongGuessMessageElem.classList.add('hidden');
+currentWrongGuesses = 0;
+wrongGuessCountForSpice = 0;
+availableWrongGuesses = 25; // Reset to initial 25 chances on full game reset
+initialPreviewTime = 3000;
+updateLivesDisplay();
+timerDisplay.textContent = 'Time: 10:00'; // Reset timer display
+gameSection.classList.add('hidden');
+winMessageElem.classList.add('hidden');
+levelTransitionMessageElem.classList.add('hidden');
+imageUploadSection.classList.remove('hidden');
+spiceButton.classList.add('hidden');
+restartGameButtonTop.style.display = 'none'; // Hide restart button when returning to upload
+
+// Ensure music button reflects playback state
+if (backgroundMusic.paused) {
+    musicToggleButton.textContent = '🔇';
+} else {
+    musicToggleButton.textContent = '🔊';
+}
+// Ensure SFX button reflects playback state
+sfxToggleButton.textContent = getSfxVolumeIcon();
+
+
+if (!retainImages) {
+fileInput.value = '';
+imagePreviewContainer.innerHTML = '';
+uploadedImageURLs = [];
+uploadMessage.textContent = '';
+startGameButton.disabled = true;
+} else {
+if (uploadedImageURLs.length >= 25) {
+uploadMessage.textContent = `Ready! You have ${uploadedImageURLs.length} images.`;
+startGameButton.disabled = false;
+} else {
+uploadMessage.textContent = `Need at least 25 unique images to play all 100 levels! You have ${uploadedImageURLs.length}.`;
+startGameButton.disabled = true;
+}
+}
+body.style.background = 'linear-gradient(135deg, #4a0000, #2a0000, #6a0000)';
+}
+
+// --- Spice Button Logic ---
+spiceButton.addEventListener('click', () => {
+if (lockBoard) return;
+if (spiceButton.disabled) return;
+
+lockBoard = true;
+spiceButton.disabled = true;
+
+const allCards = document.querySelectorAll('.card');
+allCards.forEach(card => {
+if (!card.classList.contains('matched')) {
+card.classList.add('flipped');
+}
+});
+
+setTimeout(() => {
+allCards.forEach(card => {
+if (!card.classList.contains('matched')) {
+card.classList.remove('flipped');
+}
+});
+lockBoard = false;
+}, 5000);
+});
+
+
+// Helper functions to darken/lighten colors for gradients
+function darkenColor(hslColor, percent) {
+const parts = hslColor.match(/\d+/g).map(Number);
+let h = parts[0];
+let s = parts[1];
+let l = parts[2];
+l = Math.max(0, l - percent);
+return `hsl(${h}, ${s}%, ${l}%)`;
+}
+
+function lightenColor(hslColor, percent) {
+const parts = hslColor.match(/\d+/g).map(Number);
+let h = parts[0];
+let s = parts[1];
+let l = parts[2];
+l = Math.min(100, l + percent);
+return `hsl(${h}, ${s}%, ${l}%)`;
+}
+
+resetButton.addEventListener('click', () => resetGame(false));
+restartGameButtonTop.addEventListener('click', () => resetGame(false)); // Event listener for the new restart button
+
+
+// Mobile mode toggle event listener
+mobileModeToggle.addEventListener('change', () => {
+if (mobileModeToggle.checked) {
+body.classList.add('mobile-mode-active');
+} else {
+body.classList.remove('mobile-mode-active');
+}
+// Re-render the board if already in game to apply new grid columns
+if (!gameSection.classList.contains('hidden')) {
+createBoard();
+}
+});
+
+// Music Toggle Button Logic
+musicToggleButton.addEventListener('click', () => {
+    currentMusicVolumeIndex = (currentMusicVolumeIndex + 1) % musicVolumeLevels.length;
+    musicVolume = musicVolumeLevels[currentMusicVolumeIndex];
+    backgroundMusic.volume = musicVolume;
+    if (musicVolume === 0) {
+        backgroundMusic.pause();
+        musicToggleButton.textContent = '🔇';
+    } else {
+        backgroundMusic.play().catch(e => console.warn("Background music play failed:", e));
+        if (musicVolume <= 0.25) musicToggleButton.textContent = '🔈';
+        else if (musicVolume <= 0.5) musicToggleButton.textContent = '🔉';
+        else musicToggleButton.textContent = '🔊';
+    }
+});
+
+// SFX Toggle Button Logic
+sfxToggleButton.addEventListener('click', () => {
+    currentSfxVolumeIndex = (currentSfxVolumeIndex + 1) % sfxVolumeLevels.length;
+    sfxVolume = sfxVolumeLevels[currentSfxVolumeIndex];
+    sfxToggleButton.textContent = getSfxVolumeIcon();
+});
+
+// Helper to get SFX volume icon
+function getSfxVolumeIcon() {
+    if (sfxVolume === 0) return '🔇';
+    if (sfxVolume <= 0.25) return '🔈';
+    if (sfxVolume <= 0.5) return '🔉';
+    return '🔊';
+}
+
+
+// Initial background music play attempt (might require user interaction first)
+// Set initial volumes
+backgroundMusic.volume = musicVolume;
+backgroundMusic.play().catch(e => console.warn("Initial background music play failed:", e));
+// Set initial button text based on playback state and default volume
+if (backgroundMusic.paused || musicVolume === 0) {
+    musicToggleButton.textContent = '🔇';
+} else if (musicVolume <= 0.25) {
+    musicToggleButton.textContent = '🔈';
+} else if (musicVolume <= 0.5) {
+    musicToggleButton.textContent = '🔉';
+} else {
+    musicToggleButton.textContent = '🔊';
+}
+sfxToggleButton.textContent = getSfxVolumeIcon();
+
+
+// Function to show the loading screen
+function showLoadingScreen(callback) {
+    loadingScreen.classList.remove('hidden');
+    loadingSound.currentTime = 0; // Rewind sound to start
+    loadingSound.play().catch(e => console.warn("Loading sound play failed:", e));
+
+    setTimeout(() => {
+        loadingScreen.classList.add('hidden');
+        if (callback) {
+            callback();
+        }
+    }, 4000); // 4 seconds loading time
+}
+
+});
+</script>
+</body>
+</html>
